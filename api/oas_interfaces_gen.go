@@ -13,6 +13,10 @@ type ApiTokensFindAllRes interface {
 	apiTokensFindAllRes()
 }
 
+type ApiTokensGetScopesRes interface {
+	apiTokensGetScopesRes()
+}
+
 type AuthGetStatusRes interface {
 	authGetStatusRes()
 }
@@ -41,20 +45,16 @@ type AuthRegisterRes interface {
 	authRegisterRes()
 }
 
-type AuthTelegramCallbackRes interface {
-	authTelegramCallbackRes()
-}
-
 type BandwidthStatsNodesGetNodeUserUsageRes interface {
 	bandwidthStatsNodesGetNodeUserUsageRes()
 }
 
-type BandwidthStatsNodesGetNodesRealtimeUsageRes interface {
-	bandwidthStatsNodesGetNodesRealtimeUsageRes()
-}
-
 type BandwidthStatsNodesGetStatsNodeUsersUsageRes interface {
 	bandwidthStatsNodesGetStatsNodeUsersUsageRes()
+}
+
+type BandwidthStatsNodesGetStatsNodesUsersUsageRes interface {
+	bandwidthStatsNodesGetStatsNodesUsersUsageRes()
 }
 
 type BandwidthStatsUsersGetStatsNodesUsageRes interface {
@@ -143,10 +143,6 @@ type HostsBulkActionsDisableHostsRes interface {
 
 type HostsBulkActionsEnableHostsRes interface {
 	hostsBulkActionsEnableHostsRes()
-}
-
-type HostsBulkActionsSetInboundToHostsRes interface {
-	hostsBulkActionsSetInboundToHostsRes()
 }
 
 type HostsBulkActionsSetPortToHostsRes interface {
@@ -293,12 +289,84 @@ type InternalSquadUpdateInternalSquadRes interface {
 	internalSquadUpdateInternalSquadRes()
 }
 
+type IpControlDropConnectionsRes interface {
+	ipControlDropConnectionsRes()
+}
+
+type IpControlFetchUserIpsRes interface {
+	ipControlFetchUserIpsRes()
+}
+
+type IpControlFetchUsersIpsRes interface {
+	ipControlFetchUsersIpsRes()
+}
+
+type IpControlGetFetchIpsResultRes interface {
+	ipControlGetFetchIpsResultRes()
+}
+
+type IpControlGetFetchUsersIpsResultRes interface {
+	ipControlGetFetchUsersIpsResultRes()
+}
+
 type KeygenGenerateKeyRes interface {
 	keygenGenerateKeyRes()
 }
 
+type MetadataGetNodeMetadataRes interface {
+	metadataGetNodeMetadataRes()
+}
+
+type MetadataGetUserMetadataRes interface {
+	metadataGetUserMetadataRes()
+}
+
+type MetadataUpsertNodeMetadataRes interface {
+	metadataUpsertNodeMetadataRes()
+}
+
+type MetadataUpsertUserMetadataRes interface {
+	metadataUpsertUserMetadataRes()
+}
+
+type NodePluginCloneNodePluginRes interface {
+	nodePluginCloneNodePluginRes()
+}
+
+type NodePluginCreateConfigRes interface {
+	nodePluginCreateConfigRes()
+}
+
+type NodePluginDeleteConfigRes interface {
+	nodePluginDeleteConfigRes()
+}
+
+type NodePluginGetAllConfigsRes interface {
+	nodePluginGetAllConfigsRes()
+}
+
+type NodePluginGetConfigByUuidRes interface {
+	nodePluginGetConfigByUuidRes()
+}
+
+type NodePluginPluginExecutorRes interface {
+	nodePluginPluginExecutorRes()
+}
+
+type NodePluginReorderNodePluginsRes interface {
+	nodePluginReorderNodePluginsRes()
+}
+
+type NodePluginUpdateConfigRes interface {
+	nodePluginUpdateConfigRes()
+}
+
 type NodesBulkNodesActionsRes interface {
 	nodesBulkNodesActionsRes()
+}
+
+type NodesBulkNodesUpdateRes interface {
+	nodesBulkNodesUpdateRes()
 }
 
 type NodesCreateNodeRes interface {
@@ -469,6 +537,10 @@ type SubscriptionsGetAllSubscriptionsRes interface {
 	subscriptionsGetAllSubscriptionsRes()
 }
 
+type SubscriptionsGetConnectionKeysByUuidRes interface {
+	subscriptionsGetConnectionKeysByUuidRes()
+}
+
 type SubscriptionsGetRawSubscriptionByShortUuidRes interface {
 	subscriptionsGetRawSubscriptionByShortUuidRes()
 }
@@ -493,10 +565,6 @@ type SystemDebugSrrMatcherRes interface {
 	systemDebugSrrMatcherRes()
 }
 
-type SystemEncryptHappCryptoLinkRes interface {
-	systemEncryptHappCryptoLinkRes()
-}
-
 type SystemGetBandwidthStatsRes interface {
 	systemGetBandwidthStatsRes()
 }
@@ -513,6 +581,10 @@ type SystemGetNodesStatisticsRes interface {
 	systemGetNodesStatisticsRes()
 }
 
+type SystemGetRecapRes interface {
+	systemGetRecapRes()
+}
+
 type SystemGetRemnawaveHealthRes interface {
 	systemGetRemnawaveHealthRes()
 }
@@ -523,6 +595,18 @@ type SystemGetStatsRes interface {
 
 type SystemGetX25519KeypairsRes interface {
 	systemGetX25519KeypairsRes()
+}
+
+type TorrentBlockerReportsGetTorrentBlockerReportsRes interface {
+	torrentBlockerReportsGetTorrentBlockerReportsRes()
+}
+
+type TorrentBlockerReportsGetTorrentBlockerReportsStatsRes interface {
+	torrentBlockerReportsGetTorrentBlockerReportsStatsRes()
+}
+
+type TorrentBlockerReportsTruncateTorrentBlockerReportsRes interface {
+	torrentBlockerReportsTruncateTorrentBlockerReportsRes()
 }
 
 type UserSubscriptionRequestHistoryGetSubscriptionRequestHistoryRes interface {
@@ -633,8 +717,16 @@ type UsersGetUsersByTagRes interface {
 	usersGetUsersByTagRes()
 }
 
+type UsersGetUsersStreamRes interface {
+	usersGetUsersStreamRes()
+}
+
 type UsersResetUserTrafficRes interface {
 	usersResetUserTrafficRes()
+}
+
+type UsersResolveUserRes interface {
+	usersResolveUserRes()
 }
 
 type UsersRevokeUserSubscriptionRes interface {

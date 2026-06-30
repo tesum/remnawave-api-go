@@ -34,6 +34,16 @@ type BandwidthStatsNodesGetStatsNodeUsersUsageParams struct {
 	UUID string
 }
 
+// BandwidthStatsNodesGetStatsNodesUsersUsageParams is parameters of BandwidthStatsNodes_getStatsNodesUsersUsage operation.
+type BandwidthStatsNodesGetStatsNodesUsersUsageParams struct {
+	// Limit of top users to return.
+	TopUsersLimit int
+	// Start date (YYYY-MM-DD).
+	Start time.Time
+	// End date (YYYY-MM-DD).
+	End time.Time
+}
+
 // BandwidthStatsUsersGetStatsNodesUsageParams is parameters of BandwidthStatsUsers_getStatsNodesUsage operation.
 type BandwidthStatsUsersGetStatsNodesUsageParams struct {
 	// Limit of top nodes to return.
@@ -176,6 +186,66 @@ type InternalSquadRemoveUsersFromInternalSquadParams struct {
 	UUID string
 }
 
+// IpControlFetchUserIpsParams is parameters of IpControl_fetchUserIps operation.
+type IpControlFetchUserIpsParams struct {
+	// UUID of the user.
+	UUID string
+}
+
+// IpControlFetchUsersIpsParams is parameters of IpControl_fetchUsersIps operation.
+type IpControlFetchUsersIpsParams struct {
+	// UUID of the node.
+	NodeUuid string
+}
+
+// IpControlGetFetchIpsResultParams is parameters of IpControl_getFetchIpsResult operation.
+type IpControlGetFetchIpsResultParams struct {
+	// Job ID.
+	JobId string
+}
+
+// IpControlGetFetchUsersIpsResultParams is parameters of IpControl_getFetchUsersIpsResult operation.
+type IpControlGetFetchUsersIpsResultParams struct {
+	// Job ID.
+	JobId string
+}
+
+// MetadataGetNodeMetadataParams is parameters of Metadata_getNodeMetadata operation.
+type MetadataGetNodeMetadataParams struct {
+	// UUID of the node.
+	UUID string
+}
+
+// MetadataGetUserMetadataParams is parameters of Metadata_getUserMetadata operation.
+type MetadataGetUserMetadataParams struct {
+	// UUID of the user.
+	UUID string
+}
+
+// MetadataUpsertNodeMetadataParams is parameters of Metadata_upsertNodeMetadata operation.
+type MetadataUpsertNodeMetadataParams struct {
+	// UUID of the node.
+	UUID string
+}
+
+// MetadataUpsertUserMetadataParams is parameters of Metadata_upsertUserMetadata operation.
+type MetadataUpsertUserMetadataParams struct {
+	// UUID of the user.
+	UUID string
+}
+
+// NodePluginDeleteConfigParams is parameters of NodePlugin_deleteConfig operation.
+type NodePluginDeleteConfigParams struct {
+	// Node plugin UUID.
+	UUID string
+}
+
+// NodePluginGetConfigByUuidParams is parameters of NodePlugin_getConfigByUuid operation.
+type NodePluginGetConfigByUuidParams struct {
+	// Node plugin UUID.
+	UUID string
+}
+
 // NodesDeleteNodeParams is parameters of Nodes_deleteNode operation.
 type NodesDeleteNodeParams struct {
 	// Node UUID.
@@ -242,16 +312,6 @@ type SubscriptionGetSubscriptionInfoByShortUuidParams struct {
 	ShortUuid string
 }
 
-// SubscriptionGetSubscriptionWithTypeParams is parameters of Subscription_getSubscriptionWithType operation.
-type SubscriptionGetSubscriptionWithTypeParams struct {
-	// Subscription type (required if encodedTag is provided). Only SS is supported for now.
-	Type string
-	// Base64 encoded tag for Outline config. This paramter is optional. It is required only when type=ss.
-	EncodedTag string
-	// Short UUID of the user.
-	ShortUuid string
-}
-
 // SubscriptionPageConfigDeleteConfigParams is parameters of SubscriptionPageConfig_deleteConfig operation.
 type SubscriptionPageConfigDeleteConfigParams struct {
 	// Subscription page config UUID.
@@ -284,6 +344,12 @@ type SubscriptionsGetAllSubscriptionsParams struct {
 	Start OptInt `json:",omitempty,omitzero"`
 }
 
+// SubscriptionsGetConnectionKeysByUuidParams is parameters of Subscriptions_getConnectionKeysByUuid operation.
+type SubscriptionsGetConnectionKeysByUuidParams struct {
+	// UUID of the user.
+	UUID string
+}
+
 // SubscriptionsGetRawSubscriptionByShortUuidParams is parameters of Subscriptions_getRawSubscriptionByShortUuid operation.
 type SubscriptionsGetRawSubscriptionByShortUuidParams struct {
 	// Include disabled hosts in the subscription. Default is false.
@@ -314,6 +380,14 @@ type SubscriptionsGetSubscriptionByUsernameParams struct {
 type SubscriptionsGetSubscriptionByUuidParams struct {
 	// Uuid of the user.
 	UUID string
+}
+
+// TorrentBlockerReportsGetTorrentBlockerReportsParams is parameters of TorrentBlockerReports_getTorrentBlockerReports operation.
+type TorrentBlockerReportsGetTorrentBlockerReportsParams struct {
+	// Page size for pagination.
+	Size OptInt `json:",omitempty,omitzero"`
+	// Offset for pagination.
+	Start OptInt `json:",omitempty,omitzero"`
 }
 
 // UserSubscriptionRequestHistoryGetSubscriptionRequestHistoryParams is parameters of UserSubscriptionRequestHistory_getSubscriptionRequestHistory operation.
@@ -402,6 +476,14 @@ type UsersGetUsersByEmailParams struct {
 type UsersGetUsersByTagParams struct {
 	// Tag of the user.
 	Tag string
+}
+
+// UsersGetUsersStreamParams is parameters of Users_getUsersStream operation.
+type UsersGetUsersStreamParams struct {
+	// Page size, no more than 1000 (default 250).
+	Size OptInt `json:",omitempty,omitzero"`
+	// Cursor from the previous response (nextCursor). Omit on the first request.
+	Cursor OptString `json:",omitempty,omitzero"`
 }
 
 // UsersResetUserTrafficParams is parameters of Users_resetUserTraffic operation.

@@ -50,10 +50,6 @@ func (s *CreateHostRequest) setDefaults() {
 	}
 	{
 		val := bool(false)
-		s.AllowInsecure.SetTo(val)
-	}
-	{
-		val := bool(false)
 		s.ShuffleHost.SetTo(val)
 	}
 	{
@@ -89,10 +85,6 @@ func (s *CreateUserRequest) setDefaults() {
 // setDefaults set default value of fields.
 func (s *HostItem) setDefaults() {
 	{
-		val := bool(false)
-		s.IsDisabled.SetTo(val)
-	}
-	{
 		val := HostItemSecurityLayer("DEFAULT")
 		s.SecurityLayer.SetTo(val)
 	}
@@ -108,10 +100,6 @@ func (s *HostItem) setDefaults() {
 		val := bool(false)
 		s.KeepSniBlank.SetTo(val)
 	}
-	{
-		val := bool(false)
-		s.AllowInsecure.SetTo(val)
-	}
 }
 
 // setDefaults set default value of fields.
@@ -119,6 +107,22 @@ func (s *RevokeUserSubscriptionBody) setDefaults() {
 	{
 		val := bool(false)
 		s.RevokeOnlyPasswords.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *UpdateHostRequest) setDefaults() {
+	{
+		val := bool(false)
+		s.IsDisabled.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *UpdateManyHostsRequest) setDefaults() {
+	{
+		val := bool(false)
+		s.IsDisabled.SetTo(val)
 	}
 }
 
@@ -137,7 +141,7 @@ func (s *UserItemInfo) setDefaults() {
 		s.Status.SetTo(val)
 	}
 	{
-		val := int(0)
+		val := float64(0)
 		s.TrafficLimitBytes.SetTo(val)
 	}
 	{

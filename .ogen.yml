@@ -5,7 +5,7 @@ parser:
   allow_remote: true
 
 generator:
-  ignore_not_implemented: ["object defaults"]
+  ignore_not_implemented: ["object defaults", "array defaults"]
   features:
     disable_all: true
     enable:

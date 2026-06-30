@@ -10,6 +10,7 @@ A Go SDK client for interacting with the **[Remnawave API](https://remna.st)**.
 
 | API Version | SDK Version | Install |
 |-------------|-------------|---------|
+| 2.8.0 | v2.8.0 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.8.0` |
 | 2.6.1 | v2.6.1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.6.1` |
 | 2.5.3 | v2.5.3 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.5.3` |
 | 2.3.0 | v2.3.0-6 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.3.0-6` |
@@ -28,7 +29,7 @@ Generated with [**ogen**](https://github.com/ogen-go/ogen) v1.19.0:
 ## Installation
 
 ```bash
-go get github.com/Jolymmiles/remnawave-api-go/v2@v2.6.1
+go get github.com/Jolymmiles/remnawave-api-go/v2@v2.8.0
 ```
 
 ## Quick Start
@@ -82,7 +83,7 @@ func main() {
 | `client.ExternalSquad()` | External squads |
 | `client.Hosts()` | Host management |
 | `client.HostsBulkActions()` | Bulk host operations |
-| `client.HwidUserDevices()` | HWID devices |
+| `client.HwidUserDevices()` | HWID devices |![img.png](img.png)
 | `client.InfraBilling()` | Infrastructure billing |
 | `client.InternalSquad()` | Internal squads |
 | `client.Keygen()` | Key generation |
@@ -268,7 +269,7 @@ See the [`examples/`](examples/) directory for complete working examples:
 | Requirement | Version |
 |-------------|---------|
 | Go | 1.21+ |
-| Remnawave API | 2.6.1+ |
+| Remnawave API | 2.8.0+ |
 
 ## License
 
