@@ -23,28 +23,28 @@ func main() {
 	// Wrap with organized sub-clients
 	client := remapi.NewClientExt(baseClient)
 
-	// Get user by UUID - simplified parameter (just a string)
-	resp, err := client.Users().GetUserByUuid(ctx, "550e8400-e29b-41d4-a716-446655440000")
+	// Get user by numeric ID
+	resp, err := client.Users().GetUserById(ctx, 1)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if user, ok := resp.(*remapi.UserResponse); ok {
-		fmt.Printf("User: %s (UUID: %s)\n", user.Response.Username, user.Response.UUID)
+		fmt.Printf("User: %s (ID: %v, ShortUUID: %s)\n", user.Response.Username, user.Response.ID, user.Response.ShortUuid)
 	}
 
 	// List all nodes
-	nodesResp, err := client.Nodes().GetAllNodes(ctx)
+	nodesResp, err := client.Nodes().GetNodes(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if nodes, ok := nodesResp.(*remapi.NodesResponse); ok {
+	if nodes, ok := nodesResp.(*remapi.NodesResponseResponse); ok {
 		for _, node := range nodes.Response {
 			fmt.Printf("Node: %s (%s) connected=%v\n", node.Name, node.Address, node.IsConnected)
 		}
 	}
 
 	// Create a user
-	createResp, err := client.Users().CreateUser(ctx, &remapi.CreateUserRequest{
+	createResp, err := client.Users().CreateUser(ctx, &remapi.CreateUserBody{
 		Username: "john_doe",
 	})
 	if err != nil {
@@ -54,8 +54,8 @@ func main() {
 		fmt.Printf("Created user: %s\n", created.Response.Username)
 	}
 
-	// Delete a user
-	_, err = client.Users().DeleteUser(ctx, "550e8400-e29b-41d4-a716-446655440000")
+	// Delete a user by numeric ID
+	_, err = client.Users().DeleteUser(ctx, 1)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -286,6 +286,67 @@ def fix_number_query_params(spec: dict) -> int:
 
 
 # ============================================================================
+# STEP 1.9: FLATTEN ARRAY-OF-OBJECT QUERY PARAMETERS TO JSON STRINGS
+# ============================================================================
+
+def fix_object_array_query_params(spec: dict) -> int:
+    """
+    ogen cannot generate query parameters whose array items are objects
+    (e.g. TanStack-table style `filters`/`sorting` params). The backend
+    accepts these as a JSON-encoded string on the wire, so downgrade the
+    schema to `type: string` and let callers pass a JSON-encoded value.
+    Modifies spec in-place. Returns the number of parameters fixed.
+    """
+    fixed = 0
+    for path, path_item in spec.get('paths', {}).items():
+        for http_method, op in path_item.items():
+            if not isinstance(op, dict):
+                continue
+            for param in op.get('parameters', []):
+                if param.get('in') != 'query':
+                    continue
+                schema = param.get('schema', {})
+                if schema.get('type') == 'array' and schema.get('items', {}).get('type') == 'object':
+                    param['schema'] = {'type': 'string'}
+                    fixed += 1
+    return fixed
+
+
+# ============================================================================
+# STEP 1.95: COLLAPSE STRING-ONLY anyOf UNIONS (e.g. ipv4 | ipv6)
+# ============================================================================
+
+def fix_string_anyof(spec: dict) -> int:
+    """
+    ogen cannot generate "complex anyOf" schemas. Most occurrences here are
+    unions of plain strings that only differ by format/pattern (e.g. an `ip`
+    field that is anyOf[ipv4-string, ipv6-string]). Collapse those to a
+    single `type: string`, dropping the format/pattern discrimination.
+    Modifies spec in-place. Returns the number of anyOf nodes collapsed.
+    """
+    fixed = 0
+
+    def walk(obj):
+        nonlocal fixed
+        if isinstance(obj, dict):
+            any_of = obj.get('anyOf')
+            if isinstance(any_of, list) and any_of and all(
+                isinstance(o, dict) and o.get('type') == 'string' for o in any_of
+            ):
+                del obj['anyOf']
+                obj['type'] = 'string'
+                fixed += 1
+            for v in obj.values():
+                walk(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                walk(item)
+
+    walk(spec.get('components', {}).get('schemas', {}))
+    return fixed
+
+
+# ============================================================================
 # STEP 2: GENERATE GO CLIENT WITH OGEN
 # ============================================================================
 
@@ -513,11 +574,11 @@ def generate_client_ext(spec_file: str, client_file: str, output_file: str) -> T
         
         simplified = []
         for field_name, field_type in fields:
-            if field_type in simple_types or field_type.startswith('Opt'):
+            if field_type in simple_types:
                 simple = simplify_param_type(field_type)
                 simplified.append((field_name, field_type, simple))
             else:
-                # Complex type, don't simplify
+                # Complex/enum type (e.g. OptSomeCustomEnum), don't simplify
                 return False, []
         
         return True, simplified
@@ -692,7 +753,12 @@ func (sc *{controller}Client) {display_method}(ctx context.Context'''
     print_info(f"Writing {output_file}...")
     with open(output_file, 'w') as f:
         f.write(code)
-    
+
+    print_info(f"Running gofmt on {output_file}...")
+    gofmt_result = subprocess.run(['gofmt', '-w', output_file], capture_output=True, text=True)
+    if gofmt_result.returncode != 0:
+        print_warning(f"gofmt failed: {gofmt_result.stderr}")
+
     print_success(f"Generated {matched_methods}/{total_ops} methods")
     
     return len(operations_by_controller), matched_methods
@@ -750,6 +816,14 @@ def main():
         int_count = fix_number_query_params(final_spec)
         if int_count > 0:
             print_success(f"Fixed {int_count} query parameters: number → integer")
+
+        obj_array_count = fix_object_array_query_params(final_spec)
+        if obj_array_count > 0:
+            print_success(f"Flattened {obj_array_count} array-of-object query parameters to strings")
+
+        anyof_count = fix_string_anyof(final_spec)
+        if anyof_count > 0:
+            print_success(f"Collapsed {anyof_count} string-only anyOf unions to plain string")
 
         with open(final_file, 'w') as f:
             json.dump(final_spec, f, indent=2, ensure_ascii=False)
