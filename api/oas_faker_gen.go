@@ -68,7 +68,22 @@ func (s *BadRequestError) SetFake() {
 	}
 	{
 		{
-			s.StatusCode = float64(0)
+			s.Timestamp.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
+	}
+	{
+		{
+			s.ErrorCode.SetFake()
+		}
+	}
+	{
+		{
+			s.StatusCode.SetFake()
 		}
 	}
 	{
@@ -5118,12 +5133,17 @@ func (s *InternalServerError) SetFake() {
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
 			s.ErrorCode.SetFake()
+		}
+	}
+	{
+		{
+			s.StatusCode.SetFake()
 		}
 	}
 }
@@ -5893,7 +5913,22 @@ func (s *NotFoundError) SetFake() {
 	}
 	{
 		{
-			s.StatusCode = float64(0)
+			s.Timestamp.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
+	}
+	{
+		{
+			s.ErrorCode.SetFake()
+		}
+	}
+	{
+		{
+			s.StatusCode.SetFake()
 		}
 	}
 }

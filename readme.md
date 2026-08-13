@@ -123,7 +123,7 @@ case *remapi.BadRequestError:
 case *remapi.NotFoundError:
     fmt.Println("User not found")
 case *remapi.InternalServerError:
-    fmt.Printf("Server error: %s\n", e.Message.Value)
+    fmt.Printf("Server error: %s\n", e.Message)
 }
 ```
 

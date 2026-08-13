@@ -46,6 +46,6 @@ func main() {
 
 	case *remapi.InternalServerError:
 		// 500 — server error
-		fmt.Printf("Server error: %s\n", e.Message.Value)
+		fmt.Printf("Server error: %s\n", e.Message)
 	}
 }

@@ -141,7 +141,10 @@ func (s *Authorization) SetRoles(val []string) {
 // Ref: #/components/schemas/BadRequestError
 type BadRequestError struct {
 	Message    string            `json:"message"`
-	StatusCode float64           `json:"statusCode"`
+	Timestamp  OptString         `json:"timestamp"`
+	Path       OptString         `json:"path"`
+	ErrorCode  OptString         `json:"errorCode"`
+	StatusCode OptFloat64        `json:"statusCode"`
 	Errors     []ValidationError `json:"errors"`
 }
 
@@ -150,8 +153,23 @@ func (s *BadRequestError) GetMessage() string {
 	return s.Message
 }
 
+// GetTimestamp returns the value of Timestamp.
+func (s *BadRequestError) GetTimestamp() OptString {
+	return s.Timestamp
+}
+
+// GetPath returns the value of Path.
+func (s *BadRequestError) GetPath() OptString {
+	return s.Path
+}
+
+// GetErrorCode returns the value of ErrorCode.
+func (s *BadRequestError) GetErrorCode() OptString {
+	return s.ErrorCode
+}
+
 // GetStatusCode returns the value of StatusCode.
-func (s *BadRequestError) GetStatusCode() float64 {
+func (s *BadRequestError) GetStatusCode() OptFloat64 {
 	return s.StatusCode
 }
 
@@ -165,8 +183,23 @@ func (s *BadRequestError) SetMessage(val string) {
 	s.Message = val
 }
 
+// SetTimestamp sets the value of Timestamp.
+func (s *BadRequestError) SetTimestamp(val OptString) {
+	s.Timestamp = val
+}
+
+// SetPath sets the value of Path.
+func (s *BadRequestError) SetPath(val OptString) {
+	s.Path = val
+}
+
+// SetErrorCode sets the value of ErrorCode.
+func (s *BadRequestError) SetErrorCode(val OptString) {
+	s.ErrorCode = val
+}
+
 // SetStatusCode sets the value of StatusCode.
-func (s *BadRequestError) SetStatusCode(val float64) {
+func (s *BadRequestError) SetStatusCode(val OptFloat64) {
 	s.StatusCode = val
 }
 
@@ -10249,10 +10282,11 @@ func (s *InterfaceItem) SetTxTotal(val float64) {
 
 // Ref: #/components/schemas/InternalServerError
 type InternalServerError struct {
-	Timestamp OptString `json:"timestamp"`
-	Path      OptString `json:"path"`
-	Message   OptString `json:"message"`
-	ErrorCode OptString `json:"errorCode"`
+	Timestamp  OptString  `json:"timestamp"`
+	Path       OptString  `json:"path"`
+	Message    string     `json:"message"`
+	ErrorCode  OptString  `json:"errorCode"`
+	StatusCode OptFloat64 `json:"statusCode"`
 }
 
 // GetTimestamp returns the value of Timestamp.
@@ -10266,13 +10300,18 @@ func (s *InternalServerError) GetPath() OptString {
 }
 
 // GetMessage returns the value of Message.
-func (s *InternalServerError) GetMessage() OptString {
+func (s *InternalServerError) GetMessage() string {
 	return s.Message
 }
 
 // GetErrorCode returns the value of ErrorCode.
 func (s *InternalServerError) GetErrorCode() OptString {
 	return s.ErrorCode
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *InternalServerError) GetStatusCode() OptFloat64 {
+	return s.StatusCode
 }
 
 // SetTimestamp sets the value of Timestamp.
@@ -10286,13 +10325,18 @@ func (s *InternalServerError) SetPath(val OptString) {
 }
 
 // SetMessage sets the value of Message.
-func (s *InternalServerError) SetMessage(val OptString) {
+func (s *InternalServerError) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetErrorCode sets the value of ErrorCode.
 func (s *InternalServerError) SetErrorCode(val OptString) {
 	s.ErrorCode = val
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *InternalServerError) SetStatusCode(val OptFloat64) {
+	s.StatusCode = val
 }
 
 func (*InternalServerError) apiTokensCreateApiTokenRes()                                          {}
@@ -12923,8 +12967,11 @@ func (*NodesRestartNodeAccepted) nodesRestartNodeRes() {}
 
 // Ref: #/components/schemas/NotFoundError
 type NotFoundError struct {
-	Message    string  `json:"message"`
-	StatusCode float64 `json:"statusCode"`
+	Message    string     `json:"message"`
+	Timestamp  OptString  `json:"timestamp"`
+	Path       OptString  `json:"path"`
+	ErrorCode  OptString  `json:"errorCode"`
+	StatusCode OptFloat64 `json:"statusCode"`
 }
 
 // GetMessage returns the value of Message.
@@ -12932,8 +12979,23 @@ func (s *NotFoundError) GetMessage() string {
 	return s.Message
 }
 
+// GetTimestamp returns the value of Timestamp.
+func (s *NotFoundError) GetTimestamp() OptString {
+	return s.Timestamp
+}
+
+// GetPath returns the value of Path.
+func (s *NotFoundError) GetPath() OptString {
+	return s.Path
+}
+
+// GetErrorCode returns the value of ErrorCode.
+func (s *NotFoundError) GetErrorCode() OptString {
+	return s.ErrorCode
+}
+
 // GetStatusCode returns the value of StatusCode.
-func (s *NotFoundError) GetStatusCode() float64 {
+func (s *NotFoundError) GetStatusCode() OptFloat64 {
 	return s.StatusCode
 }
 
@@ -12942,8 +13004,23 @@ func (s *NotFoundError) SetMessage(val string) {
 	s.Message = val
 }
 
+// SetTimestamp sets the value of Timestamp.
+func (s *NotFoundError) SetTimestamp(val OptString) {
+	s.Timestamp = val
+}
+
+// SetPath sets the value of Path.
+func (s *NotFoundError) SetPath(val OptString) {
+	s.Path = val
+}
+
+// SetErrorCode sets the value of ErrorCode.
+func (s *NotFoundError) SetErrorCode(val OptString) {
+	s.ErrorCode = val
+}
+
 // SetStatusCode sets the value of StatusCode.
-func (s *NotFoundError) SetStatusCode(val float64) {
+func (s *NotFoundError) SetStatusCode(val OptFloat64) {
 	s.StatusCode = val
 }
 
