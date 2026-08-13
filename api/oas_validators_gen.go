@@ -39,8 +39,15 @@ func (s *BadRequestError) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.StatusCode)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.StatusCode.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -50,9 +57,6 @@ func (s *BadRequestError) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Errors == nil {
-			return errors.New("nil is invalid value")
-		}
 		var failures []validate.FieldError
 		for i, elem := range s.Errors {
 			if err := func() error {
@@ -8637,6 +8641,36 @@ func (s *InterfaceItem) Validate() error {
 	return nil
 }
 
+func (s *InternalServerError) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.StatusCode.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "statusCode",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *InternalSquad) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -9641,8 +9675,15 @@ func (s *NotFoundError) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := (validate.Float{}).Validate(float64(s.StatusCode)); err != nil {
-			return errors.Wrap(err, "float")
+		if value, ok := s.StatusCode.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {

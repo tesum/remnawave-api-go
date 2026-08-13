@@ -1115,12 +1115,30 @@ def unify_error_responses(spec: dict) -> Tuple[dict, Dict]:
     """
     spec = copy.deepcopy(spec)
     
-    # Define common error schemas to extract
+    # Define common error schemas to extract.
+    #
+    # The real NestJS error envelope (RemnawaveBadRequestErrorDto /
+    # RemnawaveNotFoundErrorDto / RemnawaveInternalServerErrorDto / ...) is
+    # `{timestamp, path, message, errorCode}` — there is no `statusCode` on
+    # these. `statusCode` only exists on the separate validation-error shape
+    # (RemnawaveValidationErrorDto: `{message, statusCode, errors}`), which a
+    # 400 response can return instead of RemnawaveBadRequestErrorDto
+    # (`oneOf` in the upstream spec).
+    #
+    # Rather than hard-require every field from every possible variant (which
+    # breaks decoding the moment the server sends a response missing one of
+    # them — see the NotFoundError decode bug), only `message` is required
+    # here. Every other field the real API is known to send is listed as
+    # optional, so decoding never fails regardless of which variant/version
+    # of the envelope the server actually returns.
     ERROR_SCHEMAS = {
         'BadRequestError': {
             'type': 'object',
             'properties': {
                 'message': {'type': 'string'},
+                'timestamp': {'type': 'string'},
+                'path': {'type': 'string'},
+                'errorCode': {'type': 'string'},
                 'statusCode': {'type': 'number', 'example': 400},
                 'errors': {
                     'type': 'array',
@@ -1129,7 +1147,7 @@ def unify_error_responses(spec: dict) -> Tuple[dict, Dict]:
                     }
                 }
             },
-            'required': ['message', 'statusCode', 'errors']
+            'required': ['message']
         },
         'ValidationError': {
             'type': 'object',
@@ -1149,25 +1167,34 @@ def unify_error_responses(spec: dict) -> Tuple[dict, Dict]:
             'type': 'object',
             'properties': {
                 'message': {'type': 'string', 'example': 'Unauthorized'},
+                'timestamp': {'type': 'string'},
+                'path': {'type': 'string'},
+                'errorCode': {'type': 'string'},
                 'statusCode': {'type': 'number', 'example': 401}
             },
-            'required': ['message', 'statusCode']
+            'required': ['message']
         },
         'ForbiddenError': {
             'type': 'object',
             'properties': {
                 'message': {'type': 'string', 'example': 'Forbidden'},
+                'timestamp': {'type': 'string'},
+                'path': {'type': 'string'},
+                'errorCode': {'type': 'string'},
                 'statusCode': {'type': 'number', 'example': 403}
             },
-            'required': ['message', 'statusCode']
+            'required': ['message']
         },
         'NotFoundError': {
             'type': 'object',
             'properties': {
                 'message': {'type': 'string', 'example': 'Not Found'},
+                'timestamp': {'type': 'string'},
+                'path': {'type': 'string'},
+                'errorCode': {'type': 'string'},
                 'statusCode': {'type': 'number', 'example': 404}
             },
-            'required': ['message', 'statusCode']
+            'required': ['message']
         },
         'InternalServerError': {
             'type': 'object',
@@ -1175,8 +1202,10 @@ def unify_error_responses(spec: dict) -> Tuple[dict, Dict]:
                 'timestamp': {'type': 'string'},
                 'path': {'type': 'string'},
                 'message': {'type': 'string'},
-                'errorCode': {'type': 'string'}
-            }
+                'errorCode': {'type': 'string'},
+                'statusCode': {'type': 'number', 'example': 500}
+            },
+            'required': ['message']
         }
     }
     

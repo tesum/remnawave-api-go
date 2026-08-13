@@ -20431,6 +20431,15 @@
           "message": {
             "type": "string"
           },
+          "timestamp": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
           "statusCode": {
             "type": "number",
             "example": 400
@@ -20443,9 +20452,7 @@
           }
         },
         "required": [
-          "message",
-          "statusCode",
-          "errors"
+          "message"
         ]
       },
       "ValidationError": {
@@ -20487,14 +20494,22 @@
             "type": "string",
             "example": "Unauthorized"
           },
+          "timestamp": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
           "statusCode": {
             "type": "number",
             "example": 401
           }
         },
         "required": [
-          "message",
-          "statusCode"
+          "message"
         ]
       },
       "ForbiddenError": {
@@ -20504,14 +20519,22 @@
             "type": "string",
             "example": "Forbidden"
           },
+          "timestamp": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
           "statusCode": {
             "type": "number",
             "example": 403
           }
         },
         "required": [
-          "message",
-          "statusCode"
+          "message"
         ]
       },
       "NotFoundError": {
@@ -20521,14 +20544,22 @@
             "type": "string",
             "example": "Not Found"
           },
+          "timestamp": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
           "statusCode": {
             "type": "number",
             "example": 404
           }
         },
         "required": [
-          "message",
-          "statusCode"
+          "message"
         ]
       },
       "InternalServerError": {
@@ -20545,8 +20576,15 @@
           },
           "errorCode": {
             "type": "string"
+          },
+          "statusCode": {
+            "type": "number",
+            "example": 500
           }
-        }
+        },
+        "required": [
+          "message"
+        ]
       },
       "Header": {
         "type": "object",
