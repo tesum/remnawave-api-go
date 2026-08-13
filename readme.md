@@ -10,7 +10,7 @@ A Go SDK client for interacting with the **[Remnawave API](https://remna.st)**.
 
 | API Version | SDK Version | Install |
 |-------------|-------------|---------|
-| 3.2.3 | v3.2.3 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3` |
+| 3.2.3 | v3.2.3-1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3-1` |
 | 2.8.0 | v2.8.0 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.8.0` |
 | 2.6.1 | v2.6.1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.6.1` |
 | 2.5.3 | v2.5.3 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.5.3` |
@@ -30,7 +30,7 @@ Generated with [**ogen**](https://github.com/ogen-go/ogen) v1.19.0:
 ## Installation
 
 ```bash
-go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3
+go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3-1
 ```
 
 ## Quick Start
