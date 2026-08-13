@@ -7,75 +7,75 @@ import "context"
 // ClientExt wraps the base Client with organized sub-client access.
 // Use controller methods (e.g., client.Users().GetByUuid()) to call API operations.
 type ClientExt struct {
-	client *Client
-	apiTokens *ApiTokensClient
-	auth *AuthClient
-	bandwidthStatsNodes *BandwidthStatsNodesClient
-	bandwidthStatsUsers *BandwidthStatsUsersClient
-	configProfile *ConfigProfileClient
-	connections *ConnectionsClient
-	externalSquad *ExternalSquadClient
-	hosts *HostsClient
-	hostsBulkActions *HostsBulkActionsClient
-	hwidUserDevices *HwidUserDevicesClient
-	infraBilling *InfraBillingClient
-	internalSquad *InternalSquadClient
-	internalSquadStats *InternalSquadStatsClient
-	keygen *KeygenClient
-	metadata *MetadataClient
-	nodePlugin *NodePluginClient
-	nodes *NodesClient
-	nodesUsageHistory *NodesUsageHistoryClient
-	passkey *PasskeyClient
-	remnawaveSettings *RemnawaveSettingsClient
-	snippets *SnippetsClient
-	subscription *SubscriptionClient
-	subscriptionPageConfig *SubscriptionPageConfigClient
-	subscriptionSettings *SubscriptionSettingsClient
-	subscriptionTemplate *SubscriptionTemplateClient
-	subscriptions *SubscriptionsClient
-	system *SystemClient
-	torrentBlockerReports *TorrentBlockerReportsClient
+	client                         *Client
+	apiTokens                      *ApiTokensClient
+	auth                           *AuthClient
+	bandwidthStatsNodes            *BandwidthStatsNodesClient
+	bandwidthStatsUsers            *BandwidthStatsUsersClient
+	configProfile                  *ConfigProfileClient
+	connections                    *ConnectionsClient
+	externalSquad                  *ExternalSquadClient
+	hosts                          *HostsClient
+	hostsBulkActions               *HostsBulkActionsClient
+	hwidUserDevices                *HwidUserDevicesClient
+	infraBilling                   *InfraBillingClient
+	internalSquad                  *InternalSquadClient
+	internalSquadStats             *InternalSquadStatsClient
+	keygen                         *KeygenClient
+	metadata                       *MetadataClient
+	nodePlugin                     *NodePluginClient
+	nodes                          *NodesClient
+	nodesUsageHistory              *NodesUsageHistoryClient
+	passkey                        *PasskeyClient
+	remnawaveSettings              *RemnawaveSettingsClient
+	snippets                       *SnippetsClient
+	subscription                   *SubscriptionClient
+	subscriptionPageConfig         *SubscriptionPageConfigClient
+	subscriptionSettings           *SubscriptionSettingsClient
+	subscriptionTemplate           *SubscriptionTemplateClient
+	subscriptions                  *SubscriptionsClient
+	system                         *SystemClient
+	torrentBlockerReports          *TorrentBlockerReportsClient
 	userSubscriptionRequestHistory *UserSubscriptionRequestHistoryClient
-	users *UsersClient
-	usersBulkActions *UsersBulkActionsClient
+	users                          *UsersClient
+	usersBulkActions               *UsersBulkActionsClient
 }
 
 // NewClientExt creates a new ClientExt wrapper.
 func NewClientExt(client *Client) *ClientExt {
 	return &ClientExt{
-		client: client,
-		apiTokens: NewApiTokensClient(client),
-		auth: NewAuthClient(client),
-		bandwidthStatsNodes: NewBandwidthStatsNodesClient(client),
-		bandwidthStatsUsers: NewBandwidthStatsUsersClient(client),
-		configProfile: NewConfigProfileClient(client),
-		connections: NewConnectionsClient(client),
-		externalSquad: NewExternalSquadClient(client),
-		hosts: NewHostsClient(client),
-		hostsBulkActions: NewHostsBulkActionsClient(client),
-		hwidUserDevices: NewHwidUserDevicesClient(client),
-		infraBilling: NewInfraBillingClient(client),
-		internalSquad: NewInternalSquadClient(client),
-		internalSquadStats: NewInternalSquadStatsClient(client),
-		keygen: NewKeygenClient(client),
-		metadata: NewMetadataClient(client),
-		nodePlugin: NewNodePluginClient(client),
-		nodes: NewNodesClient(client),
-		nodesUsageHistory: NewNodesUsageHistoryClient(client),
-		passkey: NewPasskeyClient(client),
-		remnawaveSettings: NewRemnawaveSettingsClient(client),
-		snippets: NewSnippetsClient(client),
-		subscription: NewSubscriptionClient(client),
-		subscriptionPageConfig: NewSubscriptionPageConfigClient(client),
-		subscriptionSettings: NewSubscriptionSettingsClient(client),
-		subscriptionTemplate: NewSubscriptionTemplateClient(client),
-		subscriptions: NewSubscriptionsClient(client),
-		system: NewSystemClient(client),
-		torrentBlockerReports: NewTorrentBlockerReportsClient(client),
+		client:                         client,
+		apiTokens:                      NewApiTokensClient(client),
+		auth:                           NewAuthClient(client),
+		bandwidthStatsNodes:            NewBandwidthStatsNodesClient(client),
+		bandwidthStatsUsers:            NewBandwidthStatsUsersClient(client),
+		configProfile:                  NewConfigProfileClient(client),
+		connections:                    NewConnectionsClient(client),
+		externalSquad:                  NewExternalSquadClient(client),
+		hosts:                          NewHostsClient(client),
+		hostsBulkActions:               NewHostsBulkActionsClient(client),
+		hwidUserDevices:                NewHwidUserDevicesClient(client),
+		infraBilling:                   NewInfraBillingClient(client),
+		internalSquad:                  NewInternalSquadClient(client),
+		internalSquadStats:             NewInternalSquadStatsClient(client),
+		keygen:                         NewKeygenClient(client),
+		metadata:                       NewMetadataClient(client),
+		nodePlugin:                     NewNodePluginClient(client),
+		nodes:                          NewNodesClient(client),
+		nodesUsageHistory:              NewNodesUsageHistoryClient(client),
+		passkey:                        NewPasskeyClient(client),
+		remnawaveSettings:              NewRemnawaveSettingsClient(client),
+		snippets:                       NewSnippetsClient(client),
+		subscription:                   NewSubscriptionClient(client),
+		subscriptionPageConfig:         NewSubscriptionPageConfigClient(client),
+		subscriptionSettings:           NewSubscriptionSettingsClient(client),
+		subscriptionTemplate:           NewSubscriptionTemplateClient(client),
+		subscriptions:                  NewSubscriptionsClient(client),
+		system:                         NewSystemClient(client),
+		torrentBlockerReports:          NewTorrentBlockerReportsClient(client),
 		userSubscriptionRequestHistory: NewUserSubscriptionRequestHistoryClient(client),
-		users: NewUsersClient(client),
-		usersBulkActions: NewUsersBulkActionsClient(client),
+		users:                          NewUsersClient(client),
+		usersBulkActions:               NewUsersBulkActionsClient(client),
 	}
 }
 
@@ -614,7 +614,7 @@ func (sc *HwidUserDevicesClient) GetHwidDevicesStats(ctx context.Context, option
 func (sc *HwidUserDevicesClient) GetTopUsersByHwidDevices(ctx context.Context, start int, size int, options ...RequestOption) (HwidUserDevicesGetTopUsersByHwidDevicesRes, error) {
 	return sc.client.HwidUserDevicesGetTopUsersByHwidDevices(ctx, HwidUserDevicesGetTopUsersByHwidDevicesParams{
 		Start: NewOptInt(start),
-		Size: NewOptInt(size),
+		Size:  NewOptInt(size),
 	}, options...)
 }
 
@@ -674,7 +674,7 @@ func (sc *InfraBillingClient) GetBillingNodes(ctx context.Context, options ...Re
 func (sc *InfraBillingClient) GetInfraBillingRecords(ctx context.Context, start int, size int, options ...RequestOption) (InfraBillingGetInfraBillingRecordsRes, error) {
 	return sc.client.InfraBillingGetInfraBillingRecords(ctx, InfraBillingGetInfraBillingRecordsParams{
 		Start: NewOptInt(start),
-		Size: NewOptInt(size),
+		Size:  NewOptInt(size),
 	}, options...)
 }
 
@@ -1225,7 +1225,7 @@ func NewSubscriptionsClient(client *Client) *SubscriptionsClient {
 func (sc *SubscriptionsClient) GetAllSubscriptions(ctx context.Context, start int, size int, options ...RequestOption) (SubscriptionsGetAllSubscriptionsRes, error) {
 	return sc.client.SubscriptionsGetAllSubscriptions(ctx, SubscriptionsGetAllSubscriptionsParams{
 		Start: NewOptInt(start),
-		Size: NewOptInt(size),
+		Size:  NewOptInt(size),
 	}, options...)
 }
 
@@ -1557,4 +1557,3 @@ func (sc *UsersBulkActionsClient) BulkUpdateUsers(ctx context.Context, request *
 func (sc *UsersBulkActionsClient) BulkUpdateUsersInternalSquads(ctx context.Context, request *BulkUpdateUsersSquadsBody, options ...RequestOption) (UsersBulkActionsBulkUpdateUsersInternalSquadsRes, error) {
 	return sc.client.UsersBulkActionsBulkUpdateUsersInternalSquads(ctx, request, options...)
 }
-

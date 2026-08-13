@@ -753,7 +753,12 @@ func (sc *{controller}Client) {display_method}(ctx context.Context'''
     print_info(f"Writing {output_file}...")
     with open(output_file, 'w') as f:
         f.write(code)
-    
+
+    print_info(f"Running gofmt on {output_file}...")
+    gofmt_result = subprocess.run(['gofmt', '-w', output_file], capture_output=True, text=True)
+    if gofmt_result.returncode != 0:
+        print_warning(f"gofmt failed: {gofmt_result.stderr}")
+
     print_success(f"Generated {matched_methods}/{total_ops} methods")
     
     return len(operations_by_controller), matched_methods
