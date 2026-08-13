@@ -13,13 +13,14 @@ type ClientExt struct {
 	bandwidthStatsNodes *BandwidthStatsNodesClient
 	bandwidthStatsUsers *BandwidthStatsUsersClient
 	configProfile *ConfigProfileClient
+	connections *ConnectionsClient
 	externalSquad *ExternalSquadClient
 	hosts *HostsClient
 	hostsBulkActions *HostsBulkActionsClient
 	hwidUserDevices *HwidUserDevicesClient
 	infraBilling *InfraBillingClient
 	internalSquad *InternalSquadClient
-	ipControl *IpControlClient
+	internalSquadStats *InternalSquadStatsClient
 	keygen *KeygenClient
 	metadata *MetadataClient
 	nodePlugin *NodePluginClient
@@ -49,13 +50,14 @@ func NewClientExt(client *Client) *ClientExt {
 		bandwidthStatsNodes: NewBandwidthStatsNodesClient(client),
 		bandwidthStatsUsers: NewBandwidthStatsUsersClient(client),
 		configProfile: NewConfigProfileClient(client),
+		connections: NewConnectionsClient(client),
 		externalSquad: NewExternalSquadClient(client),
 		hosts: NewHostsClient(client),
 		hostsBulkActions: NewHostsBulkActionsClient(client),
 		hwidUserDevices: NewHwidUserDevicesClient(client),
 		infraBilling: NewInfraBillingClient(client),
 		internalSquad: NewInternalSquadClient(client),
-		ipControl: NewIpControlClient(client),
+		internalSquadStats: NewInternalSquadStatsClient(client),
 		keygen: NewKeygenClient(client),
 		metadata: NewMetadataClient(client),
 		nodePlugin: NewNodePluginClient(client),
@@ -107,6 +109,11 @@ func (ce *ClientExt) ConfigProfile() *ConfigProfileClient {
 	return ce.configProfile
 }
 
+// Connections returns the ConnectionsClient.
+func (ce *ClientExt) Connections() *ConnectionsClient {
+	return ce.connections
+}
+
 // ExternalSquad returns the ExternalSquadClient.
 func (ce *ClientExt) ExternalSquad() *ExternalSquadClient {
 	return ce.externalSquad
@@ -137,9 +144,9 @@ func (ce *ClientExt) InternalSquad() *InternalSquadClient {
 	return ce.internalSquad
 }
 
-// IpControl returns the IpControlClient.
-func (ce *ClientExt) IpControl() *IpControlClient {
-	return ce.ipControl
+// InternalSquadStats returns the InternalSquadStatsClient.
+func (ce *ClientExt) InternalSquadStats() *InternalSquadStatsClient {
+	return ce.internalSquadStats
 }
 
 // Keygen returns the KeygenClient.
@@ -242,21 +249,19 @@ func NewApiTokensClient(client *Client) *ApiTokensClient {
 	return &ApiTokensClient{client: client}
 }
 
-// Create calls ApiTokens_create.
-func (sc *ApiTokensClient) Create(ctx context.Context, request *CreateApiTokenRequest, options ...RequestOption) (ApiTokensCreateRes, error) {
-	return sc.client.ApiTokensCreate(ctx, request, options...)
+// CreateApiToken calls ApiTokens_createApiToken.
+func (sc *ApiTokensClient) CreateApiToken(ctx context.Context, request *CreateApiTokenBody, options ...RequestOption) (ApiTokensCreateApiTokenRes, error) {
+	return sc.client.ApiTokensCreateApiToken(ctx, request, options...)
 }
 
-// Delete calls ApiTokens_delete.
-func (sc *ApiTokensClient) Delete(ctx context.Context, uuid string, options ...RequestOption) (ApiTokensDeleteRes, error) {
-	return sc.client.ApiTokensDelete(ctx, ApiTokensDeleteParams{
-		UUID: uuid,
-	}, options...)
+// DeleteApiToken calls ApiTokens_deleteApiToken.
+func (sc *ApiTokensClient) DeleteApiToken(ctx context.Context, params ApiTokensDeleteApiTokenParams, options ...RequestOption) (ApiTokensDeleteApiTokenRes, error) {
+	return sc.client.ApiTokensDeleteApiToken(ctx, params, options...)
 }
 
-// FindAll calls ApiTokens_findAll.
-func (sc *ApiTokensClient) FindAll(ctx context.Context, options ...RequestOption) (ApiTokensFindAllRes, error) {
-	return sc.client.ApiTokensFindAll(ctx, options...)
+// GetApiTokens calls ApiTokens_getApiTokens.
+func (sc *ApiTokensClient) GetApiTokens(ctx context.Context, options ...RequestOption) (ApiTokensGetApiTokensRes, error) {
+	return sc.client.ApiTokensGetApiTokens(ctx, options...)
 }
 
 // GetScopes calls ApiTokens_getScopes.
@@ -280,17 +285,17 @@ func (sc *AuthClient) GetStatus(ctx context.Context, options ...RequestOption) (
 }
 
 // Login calls Auth_login.
-func (sc *AuthClient) Login(ctx context.Context, request *LoginRequest, options ...RequestOption) (AuthLoginRes, error) {
+func (sc *AuthClient) Login(ctx context.Context, request *LoginBody, options ...RequestOption) (AuthLoginRes, error) {
 	return sc.client.AuthLogin(ctx, request, options...)
 }
 
 // Oauth2Authorize calls Auth_oauth2Authorize.
-func (sc *AuthClient) Oauth2Authorize(ctx context.Context, request *OAuth2AuthorizeRequest, options ...RequestOption) (AuthOauth2AuthorizeRes, error) {
+func (sc *AuthClient) Oauth2Authorize(ctx context.Context, request *OAuth2AuthorizeBody, options ...RequestOption) (AuthOauth2AuthorizeRes, error) {
 	return sc.client.AuthOauth2Authorize(ctx, request, options...)
 }
 
 // Oauth2Callback calls Auth_oauth2Callback.
-func (sc *AuthClient) Oauth2Callback(ctx context.Context, request *OAuth2CallbackRequest, options ...RequestOption) (AuthOauth2CallbackRes, error) {
+func (sc *AuthClient) Oauth2Callback(ctx context.Context, request *OAuth2CallbackBody, options ...RequestOption) (AuthOauth2CallbackRes, error) {
 	return sc.client.AuthOauth2Callback(ctx, request, options...)
 }
 
@@ -305,7 +310,7 @@ func (sc *AuthClient) PasskeyAuthenticationVerify(ctx context.Context, request *
 }
 
 // Register calls Auth_register.
-func (sc *AuthClient) Register(ctx context.Context, request *RegisterRequest, options ...RequestOption) (AuthRegisterRes, error) {
+func (sc *AuthClient) Register(ctx context.Context, request *RegisterBody, options ...RequestOption) (AuthRegisterRes, error) {
 	return sc.client.AuthRegister(ctx, request, options...)
 }
 
@@ -319,9 +324,9 @@ func NewBandwidthStatsNodesClient(client *Client) *BandwidthStatsNodesClient {
 	return &BandwidthStatsNodesClient{client: client}
 }
 
-// GetNodeUserUsage calls BandwidthStatsNodes_getNodeUserUsage.
-func (sc *BandwidthStatsNodesClient) GetNodeUserUsage(ctx context.Context, params BandwidthStatsNodesGetNodeUserUsageParams, options ...RequestOption) (BandwidthStatsNodesGetNodeUserUsageRes, error) {
-	return sc.client.BandwidthStatsNodesGetNodeUserUsage(ctx, params, options...)
+// GetNodeUsage calls BandwidthStatsNodes_getNodeUsage.
+func (sc *BandwidthStatsNodesClient) GetNodeUsage(ctx context.Context, request *GetNodeUsageBody, params BandwidthStatsNodesGetNodeUsageParams, options ...RequestOption) (BandwidthStatsNodesGetNodeUsageRes, error) {
+	return sc.client.BandwidthStatsNodesGetNodeUsage(ctx, request, params, options...)
 }
 
 // GetStatsNodeUsersUsage calls BandwidthStatsNodes_getStatsNodeUsersUsage.
@@ -330,7 +335,7 @@ func (sc *BandwidthStatsNodesClient) GetStatsNodeUsersUsage(ctx context.Context,
 }
 
 // GetStatsNodesUsersUsage calls BandwidthStatsNodes_getStatsNodesUsersUsage.
-func (sc *BandwidthStatsNodesClient) GetStatsNodesUsersUsage(ctx context.Context, request *GetStatsNodesUsersUsageRequest, params BandwidthStatsNodesGetStatsNodesUsersUsageParams, options ...RequestOption) (BandwidthStatsNodesGetStatsNodesUsersUsageRes, error) {
+func (sc *BandwidthStatsNodesClient) GetStatsNodesUsersUsage(ctx context.Context, request *GetStatsNodesUsersUsageBody, params BandwidthStatsNodesGetStatsNodesUsersUsageParams, options ...RequestOption) (BandwidthStatsNodesGetStatsNodesUsersUsageRes, error) {
 	return sc.client.BandwidthStatsNodesGetStatsNodesUsersUsage(ctx, request, params, options...)
 }
 
@@ -349,11 +354,6 @@ func (sc *BandwidthStatsUsersClient) GetStatsNodesUsage(ctx context.Context, par
 	return sc.client.BandwidthStatsUsersGetStatsNodesUsage(ctx, params, options...)
 }
 
-// GetUserUsageByRange calls BandwidthStatsUsers_getUserUsageByRange.
-func (sc *BandwidthStatsUsersClient) GetUserUsageByRange(ctx context.Context, params BandwidthStatsUsersGetUserUsageByRangeParams, options ...RequestOption) (BandwidthStatsUsersGetUserUsageByRangeRes, error) {
-	return sc.client.BandwidthStatsUsersGetUserUsageByRange(ctx, params, options...)
-}
-
 // ConfigProfileClient provides ConfigProfile operations.
 type ConfigProfileClient struct {
 	client *Client
@@ -365,15 +365,13 @@ func NewConfigProfileClient(client *Client) *ConfigProfileClient {
 }
 
 // CreateConfigProfile calls ConfigProfile_createConfigProfile.
-func (sc *ConfigProfileClient) CreateConfigProfile(ctx context.Context, request *CreateConfigProfileRequest, options ...RequestOption) (ConfigProfileCreateConfigProfileRes, error) {
+func (sc *ConfigProfileClient) CreateConfigProfile(ctx context.Context, request *CreateConfigProfileBody, options ...RequestOption) (ConfigProfileCreateConfigProfileRes, error) {
 	return sc.client.ConfigProfileCreateConfigProfile(ctx, request, options...)
 }
 
 // DeleteConfigProfileByUuid calls ConfigProfile_deleteConfigProfileByUuid.
-func (sc *ConfigProfileClient) DeleteConfigProfileByUuid(ctx context.Context, uuid string, options ...RequestOption) (ConfigProfileDeleteConfigProfileByUuidRes, error) {
-	return sc.client.ConfigProfileDeleteConfigProfileByUuid(ctx, ConfigProfileDeleteConfigProfileByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ConfigProfileClient) DeleteConfigProfileByUuid(ctx context.Context, params ConfigProfileDeleteConfigProfileByUuidParams, options ...RequestOption) (ConfigProfileDeleteConfigProfileByUuidRes, error) {
+	return sc.client.ConfigProfileDeleteConfigProfileByUuid(ctx, params, options...)
 }
 
 // GetAllInbounds calls ConfigProfile_getAllInbounds.
@@ -382,17 +380,13 @@ func (sc *ConfigProfileClient) GetAllInbounds(ctx context.Context, options ...Re
 }
 
 // GetComputedConfigProfileByUuid calls ConfigProfile_getComputedConfigProfileByUuid.
-func (sc *ConfigProfileClient) GetComputedConfigProfileByUuid(ctx context.Context, uuid string, options ...RequestOption) (ConfigProfileGetComputedConfigProfileByUuidRes, error) {
-	return sc.client.ConfigProfileGetComputedConfigProfileByUuid(ctx, ConfigProfileGetComputedConfigProfileByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ConfigProfileClient) GetComputedConfigProfileByUuid(ctx context.Context, params ConfigProfileGetComputedConfigProfileByUuidParams, options ...RequestOption) (ConfigProfileGetComputedConfigProfileByUuidRes, error) {
+	return sc.client.ConfigProfileGetComputedConfigProfileByUuid(ctx, params, options...)
 }
 
 // GetConfigProfileByUuid calls ConfigProfile_getConfigProfileByUuid.
-func (sc *ConfigProfileClient) GetConfigProfileByUuid(ctx context.Context, uuid string, options ...RequestOption) (ConfigProfileGetConfigProfileByUuidRes, error) {
-	return sc.client.ConfigProfileGetConfigProfileByUuid(ctx, ConfigProfileGetConfigProfileByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ConfigProfileClient) GetConfigProfileByUuid(ctx context.Context, params ConfigProfileGetConfigProfileByUuidParams, options ...RequestOption) (ConfigProfileGetConfigProfileByUuidRes, error) {
+	return sc.client.ConfigProfileGetConfigProfileByUuid(ctx, params, options...)
 }
 
 // GetConfigProfiles calls ConfigProfile_getConfigProfiles.
@@ -401,20 +395,59 @@ func (sc *ConfigProfileClient) GetConfigProfiles(ctx context.Context, options ..
 }
 
 // GetInboundsByProfileUuid calls ConfigProfile_getInboundsByProfileUuid.
-func (sc *ConfigProfileClient) GetInboundsByProfileUuid(ctx context.Context, uuid string, options ...RequestOption) (ConfigProfileGetInboundsByProfileUuidRes, error) {
-	return sc.client.ConfigProfileGetInboundsByProfileUuid(ctx, ConfigProfileGetInboundsByProfileUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ConfigProfileClient) GetInboundsByProfileUuid(ctx context.Context, params ConfigProfileGetInboundsByProfileUuidParams, options ...RequestOption) (ConfigProfileGetInboundsByProfileUuidRes, error) {
+	return sc.client.ConfigProfileGetInboundsByProfileUuid(ctx, params, options...)
 }
 
 // ReorderConfigProfiles calls ConfigProfile_reorderConfigProfiles.
-func (sc *ConfigProfileClient) ReorderConfigProfiles(ctx context.Context, request *ReorderRequest, options ...RequestOption) (ConfigProfileReorderConfigProfilesRes, error) {
+func (sc *ConfigProfileClient) ReorderConfigProfiles(ctx context.Context, request *NodePluginsBodyRequest, options ...RequestOption) (ConfigProfileReorderConfigProfilesRes, error) {
 	return sc.client.ConfigProfileReorderConfigProfiles(ctx, request, options...)
 }
 
 // UpdateConfigProfile calls ConfigProfile_updateConfigProfile.
-func (sc *ConfigProfileClient) UpdateConfigProfile(ctx context.Context, request *UpdateConfigProfileRequest, options ...RequestOption) (ConfigProfileUpdateConfigProfileRes, error) {
+func (sc *ConfigProfileClient) UpdateConfigProfile(ctx context.Context, request *UpdateConfigProfileBody, options ...RequestOption) (ConfigProfileUpdateConfigProfileRes, error) {
 	return sc.client.ConfigProfileUpdateConfigProfile(ctx, request, options...)
+}
+
+// ConnectionsClient provides Connections operations.
+type ConnectionsClient struct {
+	client *Client
+}
+
+// NewConnectionsClient creates a new ConnectionsClient.
+func NewConnectionsClient(client *Client) *ConnectionsClient {
+	return &ConnectionsClient{client: client}
+}
+
+// ConnectionsByNode calls Connections_connectionsByNode.
+func (sc *ConnectionsClient) ConnectionsByNode(ctx context.Context, params ConnectionsConnectionsByNodeParams, options ...RequestOption) (ConnectionsConnectionsByNodeRes, error) {
+	return sc.client.ConnectionsConnectionsByNode(ctx, params, options...)
+}
+
+// ConnectionsByNodeResult calls Connections_connectionsByNodeResult.
+func (sc *ConnectionsClient) ConnectionsByNodeResult(ctx context.Context, jobid string, options ...RequestOption) (ConnectionsConnectionsByNodeResultRes, error) {
+	return sc.client.ConnectionsConnectionsByNodeResult(ctx, ConnectionsConnectionsByNodeResultParams{
+		JobId: jobid,
+	}, options...)
+}
+
+// ConnectionsByUser calls Connections_connectionsByUser.
+func (sc *ConnectionsClient) ConnectionsByUser(ctx context.Context, userid float64, options ...RequestOption) (ConnectionsConnectionsByUserRes, error) {
+	return sc.client.ConnectionsConnectionsByUser(ctx, ConnectionsConnectionsByUserParams{
+		UserId: userid,
+	}, options...)
+}
+
+// ConnectionsByUserResult calls Connections_connectionsByUserResult.
+func (sc *ConnectionsClient) ConnectionsByUserResult(ctx context.Context, jobid string, options ...RequestOption) (ConnectionsConnectionsByUserResultRes, error) {
+	return sc.client.ConnectionsConnectionsByUserResult(ctx, ConnectionsConnectionsByUserResultParams{
+		JobId: jobid,
+	}, options...)
+}
+
+// DropConnections calls Connections_dropConnections.
+func (sc *ConnectionsClient) DropConnections(ctx context.Context, request *DropConnectionsBody, options ...RequestOption) (ConnectionsDropConnectionsRes, error) {
+	return sc.client.ConnectionsDropConnections(ctx, request, options...)
 }
 
 // ExternalSquadClient provides ExternalSquad operations.
@@ -428,29 +461,23 @@ func NewExternalSquadClient(client *Client) *ExternalSquadClient {
 }
 
 // AddUsersToExternalSquad calls ExternalSquad_addUsersToExternalSquad.
-func (sc *ExternalSquadClient) AddUsersToExternalSquad(ctx context.Context, uuid string, options ...RequestOption) (ExternalSquadAddUsersToExternalSquadRes, error) {
-	return sc.client.ExternalSquadAddUsersToExternalSquad(ctx, ExternalSquadAddUsersToExternalSquadParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ExternalSquadClient) AddUsersToExternalSquad(ctx context.Context, params ExternalSquadAddUsersToExternalSquadParams, options ...RequestOption) (ExternalSquadAddUsersToExternalSquadRes, error) {
+	return sc.client.ExternalSquadAddUsersToExternalSquad(ctx, params, options...)
 }
 
 // CreateExternalSquad calls ExternalSquad_createExternalSquad.
-func (sc *ExternalSquadClient) CreateExternalSquad(ctx context.Context, request *CreateExternalSquadRequest, options ...RequestOption) (ExternalSquadCreateExternalSquadRes, error) {
+func (sc *ExternalSquadClient) CreateExternalSquad(ctx context.Context, request *NodePluginBodyRequest, options ...RequestOption) (ExternalSquadCreateExternalSquadRes, error) {
 	return sc.client.ExternalSquadCreateExternalSquad(ctx, request, options...)
 }
 
 // DeleteExternalSquad calls ExternalSquad_deleteExternalSquad.
-func (sc *ExternalSquadClient) DeleteExternalSquad(ctx context.Context, uuid string, options ...RequestOption) (ExternalSquadDeleteExternalSquadRes, error) {
-	return sc.client.ExternalSquadDeleteExternalSquad(ctx, ExternalSquadDeleteExternalSquadParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ExternalSquadClient) DeleteExternalSquad(ctx context.Context, params ExternalSquadDeleteExternalSquadParams, options ...RequestOption) (ExternalSquadDeleteExternalSquadRes, error) {
+	return sc.client.ExternalSquadDeleteExternalSquad(ctx, params, options...)
 }
 
 // GetExternalSquadByUuid calls ExternalSquad_getExternalSquadByUuid.
-func (sc *ExternalSquadClient) GetExternalSquadByUuid(ctx context.Context, uuid string, options ...RequestOption) (ExternalSquadGetExternalSquadByUuidRes, error) {
-	return sc.client.ExternalSquadGetExternalSquadByUuid(ctx, ExternalSquadGetExternalSquadByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ExternalSquadClient) GetExternalSquadByUuid(ctx context.Context, params ExternalSquadGetExternalSquadByUuidParams, options ...RequestOption) (ExternalSquadGetExternalSquadByUuidRes, error) {
+	return sc.client.ExternalSquadGetExternalSquadByUuid(ctx, params, options...)
 }
 
 // GetExternalSquads calls ExternalSquad_getExternalSquads.
@@ -459,19 +486,17 @@ func (sc *ExternalSquadClient) GetExternalSquads(ctx context.Context, options ..
 }
 
 // RemoveUsersFromExternalSquad calls ExternalSquad_removeUsersFromExternalSquad.
-func (sc *ExternalSquadClient) RemoveUsersFromExternalSquad(ctx context.Context, uuid string, options ...RequestOption) (ExternalSquadRemoveUsersFromExternalSquadRes, error) {
-	return sc.client.ExternalSquadRemoveUsersFromExternalSquad(ctx, ExternalSquadRemoveUsersFromExternalSquadParams{
-		UUID: uuid,
-	}, options...)
+func (sc *ExternalSquadClient) RemoveUsersFromExternalSquad(ctx context.Context, params ExternalSquadRemoveUsersFromExternalSquadParams, options ...RequestOption) (ExternalSquadRemoveUsersFromExternalSquadRes, error) {
+	return sc.client.ExternalSquadRemoveUsersFromExternalSquad(ctx, params, options...)
 }
 
 // ReorderExternalSquads calls ExternalSquad_reorderExternalSquads.
-func (sc *ExternalSquadClient) ReorderExternalSquads(ctx context.Context, request *ReorderRequest, options ...RequestOption) (ExternalSquadReorderExternalSquadsRes, error) {
+func (sc *ExternalSquadClient) ReorderExternalSquads(ctx context.Context, request *NodePluginsBodyRequest, options ...RequestOption) (ExternalSquadReorderExternalSquadsRes, error) {
 	return sc.client.ExternalSquadReorderExternalSquads(ctx, request, options...)
 }
 
 // UpdateExternalSquad calls ExternalSquad_updateExternalSquad.
-func (sc *ExternalSquadClient) UpdateExternalSquad(ctx context.Context, request *UpdateExternalSquadRequest, options ...RequestOption) (ExternalSquadUpdateExternalSquadRes, error) {
+func (sc *ExternalSquadClient) UpdateExternalSquad(ctx context.Context, request *UpdateExternalSquadBody, options ...RequestOption) (ExternalSquadUpdateExternalSquadRes, error) {
 	return sc.client.ExternalSquadUpdateExternalSquad(ctx, request, options...)
 }
 
@@ -486,41 +511,37 @@ func NewHostsClient(client *Client) *HostsClient {
 }
 
 // CreateHost calls Hosts_createHost.
-func (sc *HostsClient) CreateHost(ctx context.Context, request *CreateHostRequest, options ...RequestOption) (HostsCreateHostRes, error) {
+func (sc *HostsClient) CreateHost(ctx context.Context, request *CreateHostBody, options ...RequestOption) (HostsCreateHostRes, error) {
 	return sc.client.HostsCreateHost(ctx, request, options...)
 }
 
 // DeleteHost calls Hosts_deleteHost.
-func (sc *HostsClient) DeleteHost(ctx context.Context, uuid string, options ...RequestOption) (HostsDeleteHostRes, error) {
-	return sc.client.HostsDeleteHost(ctx, HostsDeleteHostParams{
-		UUID: uuid,
-	}, options...)
+func (sc *HostsClient) DeleteHost(ctx context.Context, params HostsDeleteHostParams, options ...RequestOption) (HostsDeleteHostRes, error) {
+	return sc.client.HostsDeleteHost(ctx, params, options...)
 }
 
-// GetAllHostTags calls Hosts_getAllHostTags.
-func (sc *HostsClient) GetAllHostTags(ctx context.Context, options ...RequestOption) (HostsGetAllHostTagsRes, error) {
-	return sc.client.HostsGetAllHostTags(ctx, options...)
+// GetHosts calls Hosts_getHosts.
+func (sc *HostsClient) GetHosts(ctx context.Context, options ...RequestOption) (HostsGetHostsRes, error) {
+	return sc.client.HostsGetHosts(ctx, options...)
 }
 
-// GetAllHosts calls Hosts_getAllHosts.
-func (sc *HostsClient) GetAllHosts(ctx context.Context, options ...RequestOption) (HostsGetAllHostsRes, error) {
-	return sc.client.HostsGetAllHosts(ctx, options...)
+// GetHostsTags calls Hosts_getHostsTags.
+func (sc *HostsClient) GetHostsTags(ctx context.Context, options ...RequestOption) (HostsGetHostsTagsRes, error) {
+	return sc.client.HostsGetHostsTags(ctx, options...)
 }
 
 // GetOneHost calls Hosts_getOneHost.
-func (sc *HostsClient) GetOneHost(ctx context.Context, uuid string, options ...RequestOption) (HostsGetOneHostRes, error) {
-	return sc.client.HostsGetOneHost(ctx, HostsGetOneHostParams{
-		UUID: uuid,
-	}, options...)
+func (sc *HostsClient) GetOneHost(ctx context.Context, params HostsGetOneHostParams, options ...RequestOption) (HostsGetOneHostRes, error) {
+	return sc.client.HostsGetOneHost(ctx, params, options...)
 }
 
 // ReorderHosts calls Hosts_reorderHosts.
-func (sc *HostsClient) ReorderHosts(ctx context.Context, request *ReorderHostRequest, options ...RequestOption) (HostsReorderHostsRes, error) {
+func (sc *HostsClient) ReorderHosts(ctx context.Context, request *ReorderHostsBody, options ...RequestOption) (HostsReorderHostsRes, error) {
 	return sc.client.HostsReorderHosts(ctx, request, options...)
 }
 
 // UpdateHost calls Hosts_updateHost.
-func (sc *HostsClient) UpdateHost(ctx context.Context, request *UpdateHostRequest, options ...RequestOption) (HostsUpdateHostRes, error) {
+func (sc *HostsClient) UpdateHost(ctx context.Context, request *UpdateHostBody, options ...RequestOption) (HostsUpdateHostRes, error) {
 	return sc.client.HostsUpdateHost(ctx, request, options...)
 }
 
@@ -535,22 +556,22 @@ func NewHostsBulkActionsClient(client *Client) *HostsBulkActionsClient {
 }
 
 // DeleteHosts calls HostsBulkActions_deleteHosts.
-func (sc *HostsBulkActionsClient) DeleteHosts(ctx context.Context, request *BulkUuidsRequest2, options ...RequestOption) (HostsBulkActionsDeleteHostsRes, error) {
+func (sc *HostsBulkActionsClient) DeleteHosts(ctx context.Context, request *HostsBodyBulkRequest, options ...RequestOption) (HostsBulkActionsDeleteHostsRes, error) {
 	return sc.client.HostsBulkActionsDeleteHosts(ctx, request, options...)
 }
 
 // DisableHosts calls HostsBulkActions_disableHosts.
-func (sc *HostsBulkActionsClient) DisableHosts(ctx context.Context, request *BulkUuidsRequest2, options ...RequestOption) (HostsBulkActionsDisableHostsRes, error) {
+func (sc *HostsBulkActionsClient) DisableHosts(ctx context.Context, request *HostsBodyBulkRequest, options ...RequestOption) (HostsBulkActionsDisableHostsRes, error) {
 	return sc.client.HostsBulkActionsDisableHosts(ctx, request, options...)
 }
 
 // EnableHosts calls HostsBulkActions_enableHosts.
-func (sc *HostsBulkActionsClient) EnableHosts(ctx context.Context, request *BulkUuidsRequest2, options ...RequestOption) (HostsBulkActionsEnableHostsRes, error) {
+func (sc *HostsBulkActionsClient) EnableHosts(ctx context.Context, request *HostsBodyBulkRequest, options ...RequestOption) (HostsBulkActionsEnableHostsRes, error) {
 	return sc.client.HostsBulkActionsEnableHosts(ctx, request, options...)
 }
 
 // SetPortToHosts calls HostsBulkActions_setPortToHosts.
-func (sc *HostsBulkActionsClient) SetPortToHosts(ctx context.Context, request *UpdateManyHostsRequest, options ...RequestOption) (HostsBulkActionsSetPortToHostsRes, error) {
+func (sc *HostsBulkActionsClient) SetPortToHosts(ctx context.Context, request *UpdateManyHostsBody, options ...RequestOption) (HostsBulkActionsSetPortToHostsRes, error) {
 	return sc.client.HostsBulkActionsSetPortToHosts(ctx, request, options...)
 }
 
@@ -565,26 +586,23 @@ func NewHwidUserDevicesClient(client *Client) *HwidUserDevicesClient {
 }
 
 // CreateUserHwidDevice calls HwidUserDevices_createUserHwidDevice.
-func (sc *HwidUserDevicesClient) CreateUserHwidDevice(ctx context.Context, request *CreateUserHwidDeviceRequest, options ...RequestOption) (HwidUserDevicesCreateUserHwidDeviceRes, error) {
+func (sc *HwidUserDevicesClient) CreateUserHwidDevice(ctx context.Context, request *CreateUserHwidDeviceBody, options ...RequestOption) (HwidUserDevicesCreateUserHwidDeviceRes, error) {
 	return sc.client.HwidUserDevicesCreateUserHwidDevice(ctx, request, options...)
 }
 
 // DeleteAllUserHwidDevices calls HwidUserDevices_deleteAllUserHwidDevices.
-func (sc *HwidUserDevicesClient) DeleteAllUserHwidDevices(ctx context.Context, request *DeleteAllUserHwidDevicesRequest, options ...RequestOption) (HwidUserDevicesDeleteAllUserHwidDevicesRes, error) {
+func (sc *HwidUserDevicesClient) DeleteAllUserHwidDevices(ctx context.Context, request *DeleteAllUserHwidDevicesBody, options ...RequestOption) (HwidUserDevicesDeleteAllUserHwidDevicesRes, error) {
 	return sc.client.HwidUserDevicesDeleteAllUserHwidDevices(ctx, request, options...)
 }
 
 // DeleteUserHwidDevice calls HwidUserDevices_deleteUserHwidDevice.
-func (sc *HwidUserDevicesClient) DeleteUserHwidDevice(ctx context.Context, request *DeleteUserHwidDeviceRequest, options ...RequestOption) (HwidUserDevicesDeleteUserHwidDeviceRes, error) {
+func (sc *HwidUserDevicesClient) DeleteUserHwidDevice(ctx context.Context, request *DeleteUserHwidDeviceBody, options ...RequestOption) (HwidUserDevicesDeleteUserHwidDeviceRes, error) {
 	return sc.client.HwidUserDevicesDeleteUserHwidDevice(ctx, request, options...)
 }
 
 // GetAllUsers calls HwidUserDevices_getAllUsers.
-func (sc *HwidUserDevicesClient) GetAllUsers(ctx context.Context, size int, start int, options ...RequestOption) (HwidUserDevicesGetAllUsersRes, error) {
-	return sc.client.HwidUserDevicesGetAllUsers(ctx, HwidUserDevicesGetAllUsersParams{
-		Size: NewOptInt(size),
-		Start: NewOptInt(start),
-	}, options...)
+func (sc *HwidUserDevicesClient) GetAllUsers(ctx context.Context, params HwidUserDevicesGetAllUsersParams, options ...RequestOption) (HwidUserDevicesGetAllUsersRes, error) {
+	return sc.client.HwidUserDevicesGetAllUsers(ctx, params, options...)
 }
 
 // GetHwidDevicesStats calls HwidUserDevices_getHwidDevicesStats.
@@ -593,17 +611,17 @@ func (sc *HwidUserDevicesClient) GetHwidDevicesStats(ctx context.Context, option
 }
 
 // GetTopUsersByHwidDevices calls HwidUserDevices_getTopUsersByHwidDevices.
-func (sc *HwidUserDevicesClient) GetTopUsersByHwidDevices(ctx context.Context, size int, start int, options ...RequestOption) (HwidUserDevicesGetTopUsersByHwidDevicesRes, error) {
+func (sc *HwidUserDevicesClient) GetTopUsersByHwidDevices(ctx context.Context, start int, size int, options ...RequestOption) (HwidUserDevicesGetTopUsersByHwidDevicesRes, error) {
 	return sc.client.HwidUserDevicesGetTopUsersByHwidDevices(ctx, HwidUserDevicesGetTopUsersByHwidDevicesParams{
-		Size: NewOptInt(size),
 		Start: NewOptInt(start),
+		Size: NewOptInt(size),
 	}, options...)
 }
 
 // GetUserHwidDevices calls HwidUserDevices_getUserHwidDevices.
-func (sc *HwidUserDevicesClient) GetUserHwidDevices(ctx context.Context, useruuid string, options ...RequestOption) (HwidUserDevicesGetUserHwidDevicesRes, error) {
+func (sc *HwidUserDevicesClient) GetUserHwidDevices(ctx context.Context, userid float64, options ...RequestOption) (HwidUserDevicesGetUserHwidDevicesRes, error) {
 	return sc.client.HwidUserDevicesGetUserHwidDevices(ctx, HwidUserDevicesGetUserHwidDevicesParams{
-		UserUuid: useruuid,
+		UserId: userid,
 	}, options...)
 }
 
@@ -617,40 +635,34 @@ func NewInfraBillingClient(client *Client) *InfraBillingClient {
 	return &InfraBillingClient{client: client}
 }
 
-// CreateInfraBillingHistoryRecord calls InfraBilling_createInfraBillingHistoryRecord.
-func (sc *InfraBillingClient) CreateInfraBillingHistoryRecord(ctx context.Context, request *CreateInfraBillingHistoryRecordRequest, options ...RequestOption) (InfraBillingCreateInfraBillingHistoryRecordRes, error) {
-	return sc.client.InfraBillingCreateInfraBillingHistoryRecord(ctx, request, options...)
-}
-
 // CreateInfraBillingNode calls InfraBilling_createInfraBillingNode.
-func (sc *InfraBillingClient) CreateInfraBillingNode(ctx context.Context, request *CreateInfraBillingNodeRequest, options ...RequestOption) (InfraBillingCreateInfraBillingNodeRes, error) {
+func (sc *InfraBillingClient) CreateInfraBillingNode(ctx context.Context, request *CreateInfraBillingNodeBody, options ...RequestOption) (InfraBillingCreateInfraBillingNodeRes, error) {
 	return sc.client.InfraBillingCreateInfraBillingNode(ctx, request, options...)
 }
 
+// CreateInfraBillingRecord calls InfraBilling_createInfraBillingRecord.
+func (sc *InfraBillingClient) CreateInfraBillingRecord(ctx context.Context, request *CreateInfraBillingRecordBody, options ...RequestOption) (InfraBillingCreateInfraBillingRecordRes, error) {
+	return sc.client.InfraBillingCreateInfraBillingRecord(ctx, request, options...)
+}
+
 // CreateInfraProvider calls InfraBilling_createInfraProvider.
-func (sc *InfraBillingClient) CreateInfraProvider(ctx context.Context, request *CreateInfraProviderRequest, options ...RequestOption) (InfraBillingCreateInfraProviderRes, error) {
+func (sc *InfraBillingClient) CreateInfraProvider(ctx context.Context, request *CreateInfraProviderBody, options ...RequestOption) (InfraBillingCreateInfraProviderRes, error) {
 	return sc.client.InfraBillingCreateInfraProvider(ctx, request, options...)
 }
 
-// DeleteInfraBillingHistoryRecordByUuid calls InfraBilling_deleteInfraBillingHistoryRecordByUuid.
-func (sc *InfraBillingClient) DeleteInfraBillingHistoryRecordByUuid(ctx context.Context, uuid string, options ...RequestOption) (InfraBillingDeleteInfraBillingHistoryRecordByUuidRes, error) {
-	return sc.client.InfraBillingDeleteInfraBillingHistoryRecordByUuid(ctx, InfraBillingDeleteInfraBillingHistoryRecordByUuidParams{
-		UUID: uuid,
-	}, options...)
+// DeleteInfraBillingNode calls InfraBilling_deleteInfraBillingNode.
+func (sc *InfraBillingClient) DeleteInfraBillingNode(ctx context.Context, params InfraBillingDeleteInfraBillingNodeParams, options ...RequestOption) (InfraBillingDeleteInfraBillingNodeRes, error) {
+	return sc.client.InfraBillingDeleteInfraBillingNode(ctx, params, options...)
 }
 
-// DeleteInfraBillingNodeByUuid calls InfraBilling_deleteInfraBillingNodeByUuid.
-func (sc *InfraBillingClient) DeleteInfraBillingNodeByUuid(ctx context.Context, uuid string, options ...RequestOption) (InfraBillingDeleteInfraBillingNodeByUuidRes, error) {
-	return sc.client.InfraBillingDeleteInfraBillingNodeByUuid(ctx, InfraBillingDeleteInfraBillingNodeByUuidParams{
-		UUID: uuid,
-	}, options...)
+// DeleteInfraBillingRecord calls InfraBilling_deleteInfraBillingRecord.
+func (sc *InfraBillingClient) DeleteInfraBillingRecord(ctx context.Context, params InfraBillingDeleteInfraBillingRecordParams, options ...RequestOption) (InfraBillingDeleteInfraBillingRecordRes, error) {
+	return sc.client.InfraBillingDeleteInfraBillingRecord(ctx, params, options...)
 }
 
-// DeleteInfraProviderByUuid calls InfraBilling_deleteInfraProviderByUuid.
-func (sc *InfraBillingClient) DeleteInfraProviderByUuid(ctx context.Context, uuid string, options ...RequestOption) (InfraBillingDeleteInfraProviderByUuidRes, error) {
-	return sc.client.InfraBillingDeleteInfraProviderByUuid(ctx, InfraBillingDeleteInfraProviderByUuidParams{
-		UUID: uuid,
-	}, options...)
+// DelteInfraProvider calls InfraBilling_delteInfraProvider.
+func (sc *InfraBillingClient) DelteInfraProvider(ctx context.Context, params InfraBillingDelteInfraProviderParams, options ...RequestOption) (InfraBillingDelteInfraProviderRes, error) {
+	return sc.client.InfraBillingDelteInfraProvider(ctx, params, options...)
 }
 
 // GetBillingNodes calls InfraBilling_getBillingNodes.
@@ -658,16 +670,17 @@ func (sc *InfraBillingClient) GetBillingNodes(ctx context.Context, options ...Re
 	return sc.client.InfraBillingGetBillingNodes(ctx, options...)
 }
 
-// GetInfraBillingHistoryRecords calls InfraBilling_getInfraBillingHistoryRecords.
-func (sc *InfraBillingClient) GetInfraBillingHistoryRecords(ctx context.Context, options ...RequestOption) (InfraBillingGetInfraBillingHistoryRecordsRes, error) {
-	return sc.client.InfraBillingGetInfraBillingHistoryRecords(ctx, options...)
+// GetInfraBillingRecords calls InfraBilling_getInfraBillingRecords.
+func (sc *InfraBillingClient) GetInfraBillingRecords(ctx context.Context, start int, size int, options ...RequestOption) (InfraBillingGetInfraBillingRecordsRes, error) {
+	return sc.client.InfraBillingGetInfraBillingRecords(ctx, InfraBillingGetInfraBillingRecordsParams{
+		Start: NewOptInt(start),
+		Size: NewOptInt(size),
+	}, options...)
 }
 
-// GetInfraProviderByUuid calls InfraBilling_getInfraProviderByUuid.
-func (sc *InfraBillingClient) GetInfraProviderByUuid(ctx context.Context, uuid string, options ...RequestOption) (InfraBillingGetInfraProviderByUuidRes, error) {
-	return sc.client.InfraBillingGetInfraProviderByUuid(ctx, InfraBillingGetInfraProviderByUuidParams{
-		UUID: uuid,
-	}, options...)
+// GetInfraProvider calls InfraBilling_getInfraProvider.
+func (sc *InfraBillingClient) GetInfraProvider(ctx context.Context, params InfraBillingGetInfraProviderParams, options ...RequestOption) (InfraBillingGetInfraProviderRes, error) {
+	return sc.client.InfraBillingGetInfraProvider(ctx, params, options...)
 }
 
 // GetInfraProviders calls InfraBilling_getInfraProviders.
@@ -676,12 +689,12 @@ func (sc *InfraBillingClient) GetInfraProviders(ctx context.Context, options ...
 }
 
 // UpdateInfraBillingNode calls InfraBilling_updateInfraBillingNode.
-func (sc *InfraBillingClient) UpdateInfraBillingNode(ctx context.Context, request *UpdateInfraBillingNodeRequest, options ...RequestOption) (InfraBillingUpdateInfraBillingNodeRes, error) {
+func (sc *InfraBillingClient) UpdateInfraBillingNode(ctx context.Context, request *UpdateInfraBillingNodeBody, options ...RequestOption) (InfraBillingUpdateInfraBillingNodeRes, error) {
 	return sc.client.InfraBillingUpdateInfraBillingNode(ctx, request, options...)
 }
 
 // UpdateInfraProvider calls InfraBilling_updateInfraProvider.
-func (sc *InfraBillingClient) UpdateInfraProvider(ctx context.Context, request *UpdateInfraProviderRequest, options ...RequestOption) (InfraBillingUpdateInfraProviderRes, error) {
+func (sc *InfraBillingClient) UpdateInfraProvider(ctx context.Context, request *UpdateInfraProviderBody, options ...RequestOption) (InfraBillingUpdateInfraProviderRes, error) {
 	return sc.client.InfraBillingUpdateInfraProvider(ctx, request, options...)
 }
 
@@ -695,37 +708,39 @@ func NewInternalSquadClient(client *Client) *InternalSquadClient {
 	return &InternalSquadClient{client: client}
 }
 
+// AddManyUsersToInternalSquad calls InternalSquad_addManyUsersToInternalSquad.
+func (sc *InternalSquadClient) AddManyUsersToInternalSquad(ctx context.Context, request *InternalSquadBodyRequest, params InternalSquadAddManyUsersToInternalSquadParams, options ...RequestOption) (InternalSquadAddManyUsersToInternalSquadRes, error) {
+	return sc.client.InternalSquadAddManyUsersToInternalSquad(ctx, request, params, options...)
+}
+
 // AddUsersToInternalSquad calls InternalSquad_addUsersToInternalSquad.
-func (sc *InternalSquadClient) AddUsersToInternalSquad(ctx context.Context, uuid string, options ...RequestOption) (InternalSquadAddUsersToInternalSquadRes, error) {
-	return sc.client.InternalSquadAddUsersToInternalSquad(ctx, InternalSquadAddUsersToInternalSquadParams{
-		UUID: uuid,
-	}, options...)
+func (sc *InternalSquadClient) AddUsersToInternalSquad(ctx context.Context, params InternalSquadAddUsersToInternalSquadParams, options ...RequestOption) (InternalSquadAddUsersToInternalSquadRes, error) {
+	return sc.client.InternalSquadAddUsersToInternalSquad(ctx, params, options...)
 }
 
 // CreateInternalSquad calls InternalSquad_createInternalSquad.
-func (sc *InternalSquadClient) CreateInternalSquad(ctx context.Context, request *CreateInternalSquadRequest, options ...RequestOption) (InternalSquadCreateInternalSquadRes, error) {
+func (sc *InternalSquadClient) CreateInternalSquad(ctx context.Context, request *CreateInternalSquadBody, options ...RequestOption) (InternalSquadCreateInternalSquadRes, error) {
 	return sc.client.InternalSquadCreateInternalSquad(ctx, request, options...)
 }
 
 // DeleteInternalSquad calls InternalSquad_deleteInternalSquad.
-func (sc *InternalSquadClient) DeleteInternalSquad(ctx context.Context, uuid string, options ...RequestOption) (InternalSquadDeleteInternalSquadRes, error) {
-	return sc.client.InternalSquadDeleteInternalSquad(ctx, InternalSquadDeleteInternalSquadParams{
-		UUID: uuid,
-	}, options...)
+func (sc *InternalSquadClient) DeleteInternalSquad(ctx context.Context, params InternalSquadDeleteInternalSquadParams, options ...RequestOption) (InternalSquadDeleteInternalSquadRes, error) {
+	return sc.client.InternalSquadDeleteInternalSquad(ctx, params, options...)
 }
 
 // GetInternalSquadAccessibleNodes calls InternalSquad_getInternalSquadAccessibleNodes.
-func (sc *InternalSquadClient) GetInternalSquadAccessibleNodes(ctx context.Context, uuid string, options ...RequestOption) (InternalSquadGetInternalSquadAccessibleNodesRes, error) {
-	return sc.client.InternalSquadGetInternalSquadAccessibleNodes(ctx, InternalSquadGetInternalSquadAccessibleNodesParams{
-		UUID: uuid,
-	}, options...)
+func (sc *InternalSquadClient) GetInternalSquadAccessibleNodes(ctx context.Context, params InternalSquadGetInternalSquadAccessibleNodesParams, options ...RequestOption) (InternalSquadGetInternalSquadAccessibleNodesRes, error) {
+	return sc.client.InternalSquadGetInternalSquadAccessibleNodes(ctx, params, options...)
 }
 
 // GetInternalSquadByUuid calls InternalSquad_getInternalSquadByUuid.
-func (sc *InternalSquadClient) GetInternalSquadByUuid(ctx context.Context, uuid string, options ...RequestOption) (InternalSquadGetInternalSquadByUuidRes, error) {
-	return sc.client.InternalSquadGetInternalSquadByUuid(ctx, InternalSquadGetInternalSquadByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *InternalSquadClient) GetInternalSquadByUuid(ctx context.Context, params InternalSquadGetInternalSquadByUuidParams, options ...RequestOption) (InternalSquadGetInternalSquadByUuidRes, error) {
+	return sc.client.InternalSquadGetInternalSquadByUuid(ctx, params, options...)
+}
+
+// GetInternalSquadUsage calls InternalSquad_getInternalSquadUsage.
+func (sc *InternalSquadClient) GetInternalSquadUsage(ctx context.Context, params InternalSquadGetInternalSquadUsageParams, options ...RequestOption) (InternalSquadGetInternalSquadUsageRes, error) {
+	return sc.client.InternalSquadGetInternalSquadUsage(ctx, params, options...)
 }
 
 // GetInternalSquads calls InternalSquad_getInternalSquads.
@@ -733,64 +748,44 @@ func (sc *InternalSquadClient) GetInternalSquads(ctx context.Context, options ..
 	return sc.client.InternalSquadGetInternalSquads(ctx, options...)
 }
 
+// RemoveManyUsersFromInternalSquad calls InternalSquad_removeManyUsersFromInternalSquad.
+func (sc *InternalSquadClient) RemoveManyUsersFromInternalSquad(ctx context.Context, request *InternalSquadBodyRequest, params InternalSquadRemoveManyUsersFromInternalSquadParams, options ...RequestOption) (InternalSquadRemoveManyUsersFromInternalSquadRes, error) {
+	return sc.client.InternalSquadRemoveManyUsersFromInternalSquad(ctx, request, params, options...)
+}
+
 // RemoveUsersFromInternalSquad calls InternalSquad_removeUsersFromInternalSquad.
-func (sc *InternalSquadClient) RemoveUsersFromInternalSquad(ctx context.Context, uuid string, options ...RequestOption) (InternalSquadRemoveUsersFromInternalSquadRes, error) {
-	return sc.client.InternalSquadRemoveUsersFromInternalSquad(ctx, InternalSquadRemoveUsersFromInternalSquadParams{
-		UUID: uuid,
-	}, options...)
+func (sc *InternalSquadClient) RemoveUsersFromInternalSquad(ctx context.Context, params InternalSquadRemoveUsersFromInternalSquadParams, options ...RequestOption) (InternalSquadRemoveUsersFromInternalSquadRes, error) {
+	return sc.client.InternalSquadRemoveUsersFromInternalSquad(ctx, params, options...)
 }
 
 // ReorderInternalSquads calls InternalSquad_reorderInternalSquads.
-func (sc *InternalSquadClient) ReorderInternalSquads(ctx context.Context, request *ReorderRequest, options ...RequestOption) (InternalSquadReorderInternalSquadsRes, error) {
+func (sc *InternalSquadClient) ReorderInternalSquads(ctx context.Context, request *NodePluginsBodyRequest, options ...RequestOption) (InternalSquadReorderInternalSquadsRes, error) {
 	return sc.client.InternalSquadReorderInternalSquads(ctx, request, options...)
 }
 
 // UpdateInternalSquad calls InternalSquad_updateInternalSquad.
-func (sc *InternalSquadClient) UpdateInternalSquad(ctx context.Context, request *UpdateInternalSquadRequest, options ...RequestOption) (InternalSquadUpdateInternalSquadRes, error) {
+func (sc *InternalSquadClient) UpdateInternalSquad(ctx context.Context, request *UpdateInternalSquadBody, options ...RequestOption) (InternalSquadUpdateInternalSquadRes, error) {
 	return sc.client.InternalSquadUpdateInternalSquad(ctx, request, options...)
 }
 
-// IpControlClient provides IpControl operations.
-type IpControlClient struct {
+// InternalSquadStatsClient provides InternalSquadStats operations.
+type InternalSquadStatsClient struct {
 	client *Client
 }
 
-// NewIpControlClient creates a new IpControlClient.
-func NewIpControlClient(client *Client) *IpControlClient {
-	return &IpControlClient{client: client}
+// NewInternalSquadStatsClient creates a new InternalSquadStatsClient.
+func NewInternalSquadStatsClient(client *Client) *InternalSquadStatsClient {
+	return &InternalSquadStatsClient{client: client}
 }
 
-// DropConnections calls IpControl_dropConnections.
-func (sc *IpControlClient) DropConnections(ctx context.Context, request *DropConnectionsRequest, options ...RequestOption) (IpControlDropConnectionsRes, error) {
-	return sc.client.IpControlDropConnections(ctx, request, options...)
+// GetInternalSquadUsage calls InternalSquadStats_getInternalSquadUsage.
+func (sc *InternalSquadStatsClient) GetInternalSquadUsage(ctx context.Context, params InternalSquadStatsGetInternalSquadUsageParams, options ...RequestOption) (InternalSquadStatsGetInternalSquadUsageRes, error) {
+	return sc.client.InternalSquadStatsGetInternalSquadUsage(ctx, params, options...)
 }
 
-// FetchUserIps calls IpControl_fetchUserIps.
-func (sc *IpControlClient) FetchUserIps(ctx context.Context, uuid string, options ...RequestOption) (IpControlFetchUserIpsRes, error) {
-	return sc.client.IpControlFetchUserIps(ctx, IpControlFetchUserIpsParams{
-		UUID: uuid,
-	}, options...)
-}
-
-// FetchUsersIps calls IpControl_fetchUsersIps.
-func (sc *IpControlClient) FetchUsersIps(ctx context.Context, nodeuuid string, options ...RequestOption) (IpControlFetchUsersIpsRes, error) {
-	return sc.client.IpControlFetchUsersIps(ctx, IpControlFetchUsersIpsParams{
-		NodeUuid: nodeuuid,
-	}, options...)
-}
-
-// GetFetchIpsResult calls IpControl_getFetchIpsResult.
-func (sc *IpControlClient) GetFetchIpsResult(ctx context.Context, jobid string, options ...RequestOption) (IpControlGetFetchIpsResultRes, error) {
-	return sc.client.IpControlGetFetchIpsResult(ctx, IpControlGetFetchIpsResultParams{
-		JobId: jobid,
-	}, options...)
-}
-
-// GetFetchUsersIpsResult calls IpControl_getFetchUsersIpsResult.
-func (sc *IpControlClient) GetFetchUsersIpsResult(ctx context.Context, jobid string, options ...RequestOption) (IpControlGetFetchUsersIpsResultRes, error) {
-	return sc.client.IpControlGetFetchUsersIpsResult(ctx, IpControlGetFetchUsersIpsResultParams{
-		JobId: jobid,
-	}, options...)
+// GetInternalSquadUserUsage calls InternalSquadStats_getInternalSquadUserUsage.
+func (sc *InternalSquadStatsClient) GetInternalSquadUserUsage(ctx context.Context, params InternalSquadStatsGetInternalSquadUserUsageParams, options ...RequestOption) (InternalSquadStatsGetInternalSquadUserUsageRes, error) {
+	return sc.client.InternalSquadStatsGetInternalSquadUserUsage(ctx, params, options...)
 }
 
 // KeygenClient provides Keygen operations.
@@ -819,30 +814,26 @@ func NewMetadataClient(client *Client) *MetadataClient {
 }
 
 // GetNodeMetadata calls Metadata_getNodeMetadata.
-func (sc *MetadataClient) GetNodeMetadata(ctx context.Context, uuid string, options ...RequestOption) (MetadataGetNodeMetadataRes, error) {
-	return sc.client.MetadataGetNodeMetadata(ctx, MetadataGetNodeMetadataParams{
-		UUID: uuid,
-	}, options...)
+func (sc *MetadataClient) GetNodeMetadata(ctx context.Context, params MetadataGetNodeMetadataParams, options ...RequestOption) (MetadataGetNodeMetadataRes, error) {
+	return sc.client.MetadataGetNodeMetadata(ctx, params, options...)
 }
 
 // GetUserMetadata calls Metadata_getUserMetadata.
-func (sc *MetadataClient) GetUserMetadata(ctx context.Context, uuid string, options ...RequestOption) (MetadataGetUserMetadataRes, error) {
+func (sc *MetadataClient) GetUserMetadata(ctx context.Context, userid float64, options ...RequestOption) (MetadataGetUserMetadataRes, error) {
 	return sc.client.MetadataGetUserMetadata(ctx, MetadataGetUserMetadataParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
 // UpsertNodeMetadata calls Metadata_upsertNodeMetadata.
-func (sc *MetadataClient) UpsertNodeMetadata(ctx context.Context, request *UpsertUserMetadataRequestBodyRequest, uuid string, options ...RequestOption) (MetadataUpsertNodeMetadataRes, error) {
-	return sc.client.MetadataUpsertNodeMetadata(ctx, request, MetadataUpsertNodeMetadataParams{
-		UUID: uuid,
-	}, options...)
+func (sc *MetadataClient) UpsertNodeMetadata(ctx context.Context, request *UpsertUserMetadataBodyRequest, params MetadataUpsertNodeMetadataParams, options ...RequestOption) (MetadataUpsertNodeMetadataRes, error) {
+	return sc.client.MetadataUpsertNodeMetadata(ctx, request, params, options...)
 }
 
 // UpsertUserMetadata calls Metadata_upsertUserMetadata.
-func (sc *MetadataClient) UpsertUserMetadata(ctx context.Context, request *UpsertUserMetadataRequestBodyRequest, uuid string, options ...RequestOption) (MetadataUpsertUserMetadataRes, error) {
+func (sc *MetadataClient) UpsertUserMetadata(ctx context.Context, request *UpsertUserMetadataBodyRequest, userid float64, options ...RequestOption) (MetadataUpsertUserMetadataRes, error) {
 	return sc.client.MetadataUpsertUserMetadata(ctx, request, MetadataUpsertUserMetadataParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
@@ -857,20 +848,18 @@ func NewNodePluginClient(client *Client) *NodePluginClient {
 }
 
 // CloneNodePlugin calls NodePlugin_cloneNodePlugin.
-func (sc *NodePluginClient) CloneNodePlugin(ctx context.Context, request *CloneNodePluginRequestRequest, options ...RequestOption) (NodePluginCloneNodePluginRes, error) {
+func (sc *NodePluginClient) CloneNodePlugin(ctx context.Context, request *CloneNodePluginBodyRequest, options ...RequestOption) (NodePluginCloneNodePluginRes, error) {
 	return sc.client.NodePluginCloneNodePlugin(ctx, request, options...)
 }
 
 // CreateConfig calls NodePlugin_createConfig.
-func (sc *NodePluginClient) CreateConfig(ctx context.Context, request *CreateNodePluginRequest, options ...RequestOption) (NodePluginCreateConfigRes, error) {
+func (sc *NodePluginClient) CreateConfig(ctx context.Context, request *NodePluginBodyRequest, options ...RequestOption) (NodePluginCreateConfigRes, error) {
 	return sc.client.NodePluginCreateConfig(ctx, request, options...)
 }
 
 // DeleteConfig calls NodePlugin_deleteConfig.
-func (sc *NodePluginClient) DeleteConfig(ctx context.Context, uuid string, options ...RequestOption) (NodePluginDeleteConfigRes, error) {
-	return sc.client.NodePluginDeleteConfig(ctx, NodePluginDeleteConfigParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodePluginClient) DeleteConfig(ctx context.Context, params NodePluginDeleteConfigParams, options ...RequestOption) (NodePluginDeleteConfigRes, error) {
+	return sc.client.NodePluginDeleteConfig(ctx, params, options...)
 }
 
 // GetAllConfigs calls NodePlugin_getAllConfigs.
@@ -879,24 +868,22 @@ func (sc *NodePluginClient) GetAllConfigs(ctx context.Context, options ...Reques
 }
 
 // GetConfigByUuid calls NodePlugin_getConfigByUuid.
-func (sc *NodePluginClient) GetConfigByUuid(ctx context.Context, uuid string, options ...RequestOption) (NodePluginGetConfigByUuidRes, error) {
-	return sc.client.NodePluginGetConfigByUuid(ctx, NodePluginGetConfigByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodePluginClient) GetConfigByUuid(ctx context.Context, params NodePluginGetConfigByUuidParams, options ...RequestOption) (NodePluginGetConfigByUuidRes, error) {
+	return sc.client.NodePluginGetConfigByUuid(ctx, params, options...)
 }
 
 // PluginExecutor calls NodePlugin_pluginExecutor.
-func (sc *NodePluginClient) PluginExecutor(ctx context.Context, request *PluginExecutorRequest, options ...RequestOption) (NodePluginPluginExecutorRes, error) {
+func (sc *NodePluginClient) PluginExecutor(ctx context.Context, request *PluginExecutorBody, options ...RequestOption) (NodePluginPluginExecutorRes, error) {
 	return sc.client.NodePluginPluginExecutor(ctx, request, options...)
 }
 
 // ReorderNodePlugins calls NodePlugin_reorderNodePlugins.
-func (sc *NodePluginClient) ReorderNodePlugins(ctx context.Context, request *ReorderRequest, options ...RequestOption) (NodePluginReorderNodePluginsRes, error) {
+func (sc *NodePluginClient) ReorderNodePlugins(ctx context.Context, request *NodePluginsBodyRequest, options ...RequestOption) (NodePluginReorderNodePluginsRes, error) {
 	return sc.client.NodePluginReorderNodePlugins(ctx, request, options...)
 }
 
 // UpdateConfig calls NodePlugin_updateConfig.
-func (sc *NodePluginClient) UpdateConfig(ctx context.Context, request *UpdateNodePluginRequest, options ...RequestOption) (NodePluginUpdateConfigRes, error) {
+func (sc *NodePluginClient) UpdateConfig(ctx context.Context, request *UpdateNodePluginBody, options ...RequestOption) (NodePluginUpdateConfigRes, error) {
 	return sc.client.NodePluginUpdateConfig(ctx, request, options...)
 }
 
@@ -911,89 +898,77 @@ func NewNodesClient(client *Client) *NodesClient {
 }
 
 // BulkNodesActions calls Nodes_bulkNodesActions.
-func (sc *NodesClient) BulkNodesActions(ctx context.Context, request *BulkNodesActionsRequest, options ...RequestOption) (NodesBulkNodesActionsRes, error) {
+func (sc *NodesClient) BulkNodesActions(ctx context.Context, request *BulkNodesActionsBody, options ...RequestOption) (NodesBulkNodesActionsRes, error) {
 	return sc.client.NodesBulkNodesActions(ctx, request, options...)
 }
 
 // BulkNodesUpdate calls Nodes_bulkNodesUpdate.
-func (sc *NodesClient) BulkNodesUpdate(ctx context.Context, request *BulkNodesUpdateRequest, options ...RequestOption) (NodesBulkNodesUpdateRes, error) {
+func (sc *NodesClient) BulkNodesUpdate(ctx context.Context, request *BulkNodesUpdateBody, options ...RequestOption) (NodesBulkNodesUpdateRes, error) {
 	return sc.client.NodesBulkNodesUpdate(ctx, request, options...)
 }
 
 // CreateNode calls Nodes_createNode.
-func (sc *NodesClient) CreateNode(ctx context.Context, request *CreateNodeRequest, options ...RequestOption) (NodesCreateNodeRes, error) {
+func (sc *NodesClient) CreateNode(ctx context.Context, request *CreateNodeBody, options ...RequestOption) (NodesCreateNodeRes, error) {
 	return sc.client.NodesCreateNode(ctx, request, options...)
 }
 
 // DeleteNode calls Nodes_deleteNode.
-func (sc *NodesClient) DeleteNode(ctx context.Context, uuid string, options ...RequestOption) (NodesDeleteNodeRes, error) {
-	return sc.client.NodesDeleteNode(ctx, NodesDeleteNodeParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodesClient) DeleteNode(ctx context.Context, params NodesDeleteNodeParams, options ...RequestOption) (NodesDeleteNodeRes, error) {
+	return sc.client.NodesDeleteNode(ctx, params, options...)
 }
 
 // DisableNode calls Nodes_disableNode.
-func (sc *NodesClient) DisableNode(ctx context.Context, uuid string, options ...RequestOption) (NodesDisableNodeRes, error) {
-	return sc.client.NodesDisableNode(ctx, NodesDisableNodeParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodesClient) DisableNode(ctx context.Context, params NodesDisableNodeParams, options ...RequestOption) (NodesDisableNodeRes, error) {
+	return sc.client.NodesDisableNode(ctx, params, options...)
 }
 
 // EnableNode calls Nodes_enableNode.
-func (sc *NodesClient) EnableNode(ctx context.Context, uuid string, options ...RequestOption) (NodesEnableNodeRes, error) {
-	return sc.client.NodesEnableNode(ctx, NodesEnableNodeParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodesClient) EnableNode(ctx context.Context, params NodesEnableNodeParams, options ...RequestOption) (NodesEnableNodeRes, error) {
+	return sc.client.NodesEnableNode(ctx, params, options...)
 }
 
-// GetAllNodes calls Nodes_getAllNodes.
-func (sc *NodesClient) GetAllNodes(ctx context.Context, options ...RequestOption) (NodesGetAllNodesRes, error) {
-	return sc.client.NodesGetAllNodes(ctx, options...)
+// GetNode calls Nodes_getNode.
+func (sc *NodesClient) GetNode(ctx context.Context, params NodesGetNodeParams, options ...RequestOption) (NodesGetNodeRes, error) {
+	return sc.client.NodesGetNode(ctx, params, options...)
 }
 
-// GetAllNodesTags calls Nodes_getAllNodesTags.
-func (sc *NodesClient) GetAllNodesTags(ctx context.Context, options ...RequestOption) (NodesGetAllNodesTagsRes, error) {
-	return sc.client.NodesGetAllNodesTags(ctx, options...)
+// GetNodes calls Nodes_getNodes.
+func (sc *NodesClient) GetNodes(ctx context.Context, options ...RequestOption) (NodesGetNodesRes, error) {
+	return sc.client.NodesGetNodes(ctx, options...)
 }
 
-// GetOneNode calls Nodes_getOneNode.
-func (sc *NodesClient) GetOneNode(ctx context.Context, uuid string, options ...RequestOption) (NodesGetOneNodeRes, error) {
-	return sc.client.NodesGetOneNode(ctx, NodesGetOneNodeParams{
-		UUID: uuid,
-	}, options...)
+// GetNodesTags calls Nodes_getNodesTags.
+func (sc *NodesClient) GetNodesTags(ctx context.Context, options ...RequestOption) (NodesGetNodesTagsRes, error) {
+	return sc.client.NodesGetNodesTags(ctx, options...)
 }
 
 // ProfileModification calls Nodes_profileModification.
-func (sc *NodesClient) ProfileModification(ctx context.Context, request *ProfileModificationRequest, options ...RequestOption) (NodesProfileModificationRes, error) {
+func (sc *NodesClient) ProfileModification(ctx context.Context, request *ProfileModificationBody, options ...RequestOption) (NodesProfileModificationRes, error) {
 	return sc.client.NodesProfileModification(ctx, request, options...)
 }
 
 // ReorderNodes calls Nodes_reorderNodes.
-func (sc *NodesClient) ReorderNodes(ctx context.Context, request *ReorderNodeRequest, options ...RequestOption) (NodesReorderNodesRes, error) {
+func (sc *NodesClient) ReorderNodes(ctx context.Context, request *ReorderNodesBody, options ...RequestOption) (NodesReorderNodesRes, error) {
 	return sc.client.NodesReorderNodes(ctx, request, options...)
 }
 
 // ResetNodeTraffic calls Nodes_resetNodeTraffic.
-func (sc *NodesClient) ResetNodeTraffic(ctx context.Context, uuid string, options ...RequestOption) (NodesResetNodeTrafficRes, error) {
-	return sc.client.NodesResetNodeTraffic(ctx, NodesResetNodeTrafficParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodesClient) ResetNodeTraffic(ctx context.Context, params NodesResetNodeTrafficParams, options ...RequestOption) (NodesResetNodeTrafficRes, error) {
+	return sc.client.NodesResetNodeTraffic(ctx, params, options...)
 }
 
 // RestartAllNodes calls Nodes_restartAllNodes.
-func (sc *NodesClient) RestartAllNodes(ctx context.Context, request *NodeRequestBodyRequest, options ...RequestOption) (NodesRestartAllNodesRes, error) {
+func (sc *NodesClient) RestartAllNodes(ctx context.Context, request *NodeBodyRequest, options ...RequestOption) (NodesRestartAllNodesRes, error) {
 	return sc.client.NodesRestartAllNodes(ctx, request, options...)
 }
 
 // RestartNode calls Nodes_restartNode.
-func (sc *NodesClient) RestartNode(ctx context.Context, request *NodeRequestBodyRequest, uuid string, options ...RequestOption) (NodesRestartNodeRes, error) {
-	return sc.client.NodesRestartNode(ctx, request, NodesRestartNodeParams{
-		UUID: uuid,
-	}, options...)
+func (sc *NodesClient) RestartNode(ctx context.Context, request *NodeBodyRequest, params NodesRestartNodeParams, options ...RequestOption) (NodesRestartNodeRes, error) {
+	return sc.client.NodesRestartNode(ctx, request, params, options...)
 }
 
 // UpdateNode calls Nodes_updateNode.
-func (sc *NodesClient) UpdateNode(ctx context.Context, request *UpdateNodeRequest, options ...RequestOption) (NodesUpdateNodeRes, error) {
+func (sc *NodesClient) UpdateNode(ctx context.Context, request *UpdateNodeBody, options ...RequestOption) (NodesUpdateNodeRes, error) {
 	return sc.client.NodesUpdateNode(ctx, request, options...)
 }
 
@@ -1023,7 +998,7 @@ func NewPasskeyClient(client *Client) *PasskeyClient {
 }
 
 // DeletePasskey calls Passkey_deletePasskey.
-func (sc *PasskeyClient) DeletePasskey(ctx context.Context, request *DeletePasskeyRequest, options ...RequestOption) (PasskeyDeletePasskeyRes, error) {
+func (sc *PasskeyClient) DeletePasskey(ctx context.Context, request *DeletePasskeyBody, options ...RequestOption) (PasskeyDeletePasskeyRes, error) {
 	return sc.client.PasskeyDeletePasskey(ctx, request, options...)
 }
 
@@ -1043,7 +1018,7 @@ func (sc *PasskeyClient) PasskeyRegistrationVerify(ctx context.Context, request 
 }
 
 // UpdatePasskey calls Passkey_updatePasskey.
-func (sc *PasskeyClient) UpdatePasskey(ctx context.Context, request *UpdatePasskeyRequest, options ...RequestOption) (PasskeyUpdatePasskeyRes, error) {
+func (sc *PasskeyClient) UpdatePasskey(ctx context.Context, request *UpdatePasskeyBody, options ...RequestOption) (PasskeyUpdatePasskeyRes, error) {
 	return sc.client.PasskeyUpdatePasskey(ctx, request, options...)
 }
 
@@ -1063,7 +1038,7 @@ func (sc *RemnawaveSettingsClient) GetSettings(ctx context.Context, options ...R
 }
 
 // UpdateSettings calls RemnawaveSettings_updateSettings.
-func (sc *RemnawaveSettingsClient) UpdateSettings(ctx context.Context, request *UpdateRemnawaveSettingsRequest, options ...RequestOption) (RemnawaveSettingsUpdateSettingsRes, error) {
+func (sc *RemnawaveSettingsClient) UpdateSettings(ctx context.Context, request *UpdateRemnawaveSettingsBody, options ...RequestOption) (RemnawaveSettingsUpdateSettingsRes, error) {
 	return sc.client.RemnawaveSettingsUpdateSettings(ctx, request, options...)
 }
 
@@ -1078,12 +1053,12 @@ func NewSnippetsClient(client *Client) *SnippetsClient {
 }
 
 // CreateSnippet calls Snippets_createSnippet.
-func (sc *SnippetsClient) CreateSnippet(ctx context.Context, request *SnippetRequest, options ...RequestOption) (SnippetsCreateSnippetRes, error) {
+func (sc *SnippetsClient) CreateSnippet(ctx context.Context, request *SnippetBodyRequest2, options ...RequestOption) (SnippetsCreateSnippetRes, error) {
 	return sc.client.SnippetsCreateSnippet(ctx, request, options...)
 }
 
 // DeleteSnippetByName calls Snippets_deleteSnippetByName.
-func (sc *SnippetsClient) DeleteSnippetByName(ctx context.Context, request *DeleteSnippetRequest, options ...RequestOption) (SnippetsDeleteSnippetByNameRes, error) {
+func (sc *SnippetsClient) DeleteSnippetByName(ctx context.Context, request *SnippetBodyRequest, options ...RequestOption) (SnippetsDeleteSnippetByNameRes, error) {
 	return sc.client.SnippetsDeleteSnippetByName(ctx, request, options...)
 }
 
@@ -1092,8 +1067,13 @@ func (sc *SnippetsClient) GetSnippets(ctx context.Context, options ...RequestOpt
 	return sc.client.SnippetsGetSnippets(ctx, options...)
 }
 
+// SyncSnippet calls Snippets_syncSnippet.
+func (sc *SnippetsClient) SyncSnippet(ctx context.Context, request *SnippetBodyRequest, options ...RequestOption) (SnippetsSyncSnippetRes, error) {
+	return sc.client.SnippetsSyncSnippet(ctx, request, options...)
+}
+
 // UpdateSnippet calls Snippets_updateSnippet.
-func (sc *SnippetsClient) UpdateSnippet(ctx context.Context, request *SnippetRequest, options ...RequestOption) (SnippetsUpdateSnippetRes, error) {
+func (sc *SnippetsClient) UpdateSnippet(ctx context.Context, request *SnippetBodyRequest2, options ...RequestOption) (SnippetsUpdateSnippetRes, error) {
 	return sc.client.SnippetsUpdateSnippet(ctx, request, options...)
 }
 
@@ -1108,14 +1088,14 @@ func NewSubscriptionClient(client *Client) *SubscriptionClient {
 }
 
 // GetSubscription calls Subscription_getSubscription.
-func (sc *SubscriptionClient) GetSubscription(ctx context.Context, shortuuid string, options ...RequestOption) (SubscriptionGetSubscriptionOK, error) {
+func (sc *SubscriptionClient) GetSubscription(ctx context.Context, shortuuid string, options ...RequestOption) (SubscriptionGetSubscriptionRes, error) {
 	return sc.client.SubscriptionGetSubscription(ctx, SubscriptionGetSubscriptionParams{
 		ShortUuid: shortuuid,
 	}, options...)
 }
 
 // GetSubscriptionByClientType calls Subscription_getSubscriptionByClientType.
-func (sc *SubscriptionClient) GetSubscriptionByClientType(ctx context.Context, params SubscriptionGetSubscriptionByClientTypeParams, options ...RequestOption) (SubscriptionGetSubscriptionByClientTypeOK, error) {
+func (sc *SubscriptionClient) GetSubscriptionByClientType(ctx context.Context, params SubscriptionGetSubscriptionByClientTypeParams, options ...RequestOption) (SubscriptionGetSubscriptionByClientTypeRes, error) {
 	return sc.client.SubscriptionGetSubscriptionByClientType(ctx, params, options...)
 }
 
@@ -1137,20 +1117,18 @@ func NewSubscriptionPageConfigClient(client *Client) *SubscriptionPageConfigClie
 }
 
 // CloneSubscriptionPageConfig calls SubscriptionPageConfig_cloneSubscriptionPageConfig.
-func (sc *SubscriptionPageConfigClient) CloneSubscriptionPageConfig(ctx context.Context, request *CloneNodePluginRequestRequest, options ...RequestOption) (SubscriptionPageConfigCloneSubscriptionPageConfigRes, error) {
+func (sc *SubscriptionPageConfigClient) CloneSubscriptionPageConfig(ctx context.Context, request *CloneNodePluginBodyRequest, options ...RequestOption) (SubscriptionPageConfigCloneSubscriptionPageConfigRes, error) {
 	return sc.client.SubscriptionPageConfigCloneSubscriptionPageConfig(ctx, request, options...)
 }
 
 // CreateConfig calls SubscriptionPageConfig_createConfig.
-func (sc *SubscriptionPageConfigClient) CreateConfig(ctx context.Context, request *CreateSubscriptionPageConfigRequest, options ...RequestOption) (SubscriptionPageConfigCreateConfigRes, error) {
+func (sc *SubscriptionPageConfigClient) CreateConfig(ctx context.Context, request *NodePluginBodyRequest, options ...RequestOption) (SubscriptionPageConfigCreateConfigRes, error) {
 	return sc.client.SubscriptionPageConfigCreateConfig(ctx, request, options...)
 }
 
 // DeleteConfig calls SubscriptionPageConfig_deleteConfig.
-func (sc *SubscriptionPageConfigClient) DeleteConfig(ctx context.Context, uuid string, options ...RequestOption) (SubscriptionPageConfigDeleteConfigRes, error) {
-	return sc.client.SubscriptionPageConfigDeleteConfig(ctx, SubscriptionPageConfigDeleteConfigParams{
-		UUID: uuid,
-	}, options...)
+func (sc *SubscriptionPageConfigClient) DeleteConfig(ctx context.Context, params SubscriptionPageConfigDeleteConfigParams, options ...RequestOption) (SubscriptionPageConfigDeleteConfigRes, error) {
+	return sc.client.SubscriptionPageConfigDeleteConfig(ctx, params, options...)
 }
 
 // GetAllConfigs calls SubscriptionPageConfig_getAllConfigs.
@@ -1159,19 +1137,17 @@ func (sc *SubscriptionPageConfigClient) GetAllConfigs(ctx context.Context, optio
 }
 
 // GetConfigByUuid calls SubscriptionPageConfig_getConfigByUuid.
-func (sc *SubscriptionPageConfigClient) GetConfigByUuid(ctx context.Context, uuid string, options ...RequestOption) (SubscriptionPageConfigGetConfigByUuidRes, error) {
-	return sc.client.SubscriptionPageConfigGetConfigByUuid(ctx, SubscriptionPageConfigGetConfigByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *SubscriptionPageConfigClient) GetConfigByUuid(ctx context.Context, params SubscriptionPageConfigGetConfigByUuidParams, options ...RequestOption) (SubscriptionPageConfigGetConfigByUuidRes, error) {
+	return sc.client.SubscriptionPageConfigGetConfigByUuid(ctx, params, options...)
 }
 
 // ReorderSubscriptionPageConfigs calls SubscriptionPageConfig_reorderSubscriptionPageConfigs.
-func (sc *SubscriptionPageConfigClient) ReorderSubscriptionPageConfigs(ctx context.Context, request *ReorderRequest, options ...RequestOption) (SubscriptionPageConfigReorderSubscriptionPageConfigsRes, error) {
+func (sc *SubscriptionPageConfigClient) ReorderSubscriptionPageConfigs(ctx context.Context, request *NodePluginsBodyRequest, options ...RequestOption) (SubscriptionPageConfigReorderSubscriptionPageConfigsRes, error) {
 	return sc.client.SubscriptionPageConfigReorderSubscriptionPageConfigs(ctx, request, options...)
 }
 
 // UpdateConfig calls SubscriptionPageConfig_updateConfig.
-func (sc *SubscriptionPageConfigClient) UpdateConfig(ctx context.Context, request *UpdateSubscriptionPageConfigRequest, options ...RequestOption) (SubscriptionPageConfigUpdateConfigRes, error) {
+func (sc *SubscriptionPageConfigClient) UpdateConfig(ctx context.Context, request *UpdateSubpageConfigBody, options ...RequestOption) (SubscriptionPageConfigUpdateConfigRes, error) {
 	return sc.client.SubscriptionPageConfigUpdateConfig(ctx, request, options...)
 }
 
@@ -1191,7 +1167,7 @@ func (sc *SubscriptionSettingsClient) GetSettings(ctx context.Context, options .
 }
 
 // UpdateSettings calls SubscriptionSettings_updateSettings.
-func (sc *SubscriptionSettingsClient) UpdateSettings(ctx context.Context, request *UpdateSubscriptionSettingsRequest, options ...RequestOption) (SubscriptionSettingsUpdateSettingsRes, error) {
+func (sc *SubscriptionSettingsClient) UpdateSettings(ctx context.Context, request *UpdateSubscriptionSettingsBody, options ...RequestOption) (SubscriptionSettingsUpdateSettingsRes, error) {
 	return sc.client.SubscriptionSettingsUpdateSettings(ctx, request, options...)
 }
 
@@ -1206,15 +1182,13 @@ func NewSubscriptionTemplateClient(client *Client) *SubscriptionTemplateClient {
 }
 
 // CreateTemplate calls SubscriptionTemplate_createTemplate.
-func (sc *SubscriptionTemplateClient) CreateTemplate(ctx context.Context, request *CreateSubscriptionTemplateRequest, options ...RequestOption) (SubscriptionTemplateCreateTemplateRes, error) {
+func (sc *SubscriptionTemplateClient) CreateTemplate(ctx context.Context, request *CreateSubscriptionTemplateBody, options ...RequestOption) (SubscriptionTemplateCreateTemplateRes, error) {
 	return sc.client.SubscriptionTemplateCreateTemplate(ctx, request, options...)
 }
 
 // DeleteTemplate calls SubscriptionTemplate_deleteTemplate.
-func (sc *SubscriptionTemplateClient) DeleteTemplate(ctx context.Context, uuid string, options ...RequestOption) (SubscriptionTemplateDeleteTemplateRes, error) {
-	return sc.client.SubscriptionTemplateDeleteTemplate(ctx, SubscriptionTemplateDeleteTemplateParams{
-		UUID: uuid,
-	}, options...)
+func (sc *SubscriptionTemplateClient) DeleteTemplate(ctx context.Context, params SubscriptionTemplateDeleteTemplateParams, options ...RequestOption) (SubscriptionTemplateDeleteTemplateRes, error) {
+	return sc.client.SubscriptionTemplateDeleteTemplate(ctx, params, options...)
 }
 
 // GetAllTemplates calls SubscriptionTemplate_getAllTemplates.
@@ -1223,19 +1197,17 @@ func (sc *SubscriptionTemplateClient) GetAllTemplates(ctx context.Context, optio
 }
 
 // GetTemplateByUuid calls SubscriptionTemplate_getTemplateByUuid.
-func (sc *SubscriptionTemplateClient) GetTemplateByUuid(ctx context.Context, uuid string, options ...RequestOption) (SubscriptionTemplateGetTemplateByUuidRes, error) {
-	return sc.client.SubscriptionTemplateGetTemplateByUuid(ctx, SubscriptionTemplateGetTemplateByUuidParams{
-		UUID: uuid,
-	}, options...)
+func (sc *SubscriptionTemplateClient) GetTemplateByUuid(ctx context.Context, params SubscriptionTemplateGetTemplateByUuidParams, options ...RequestOption) (SubscriptionTemplateGetTemplateByUuidRes, error) {
+	return sc.client.SubscriptionTemplateGetTemplateByUuid(ctx, params, options...)
 }
 
 // ReorderSubscriptionTemplates calls SubscriptionTemplate_reorderSubscriptionTemplates.
-func (sc *SubscriptionTemplateClient) ReorderSubscriptionTemplates(ctx context.Context, request *ReorderRequest, options ...RequestOption) (SubscriptionTemplateReorderSubscriptionTemplatesRes, error) {
+func (sc *SubscriptionTemplateClient) ReorderSubscriptionTemplates(ctx context.Context, request *NodePluginsBodyRequest, options ...RequestOption) (SubscriptionTemplateReorderSubscriptionTemplatesRes, error) {
 	return sc.client.SubscriptionTemplateReorderSubscriptionTemplates(ctx, request, options...)
 }
 
 // UpdateTemplate calls SubscriptionTemplate_updateTemplate.
-func (sc *SubscriptionTemplateClient) UpdateTemplate(ctx context.Context, request *UpdateTemplateRequest, options ...RequestOption) (SubscriptionTemplateUpdateTemplateRes, error) {
+func (sc *SubscriptionTemplateClient) UpdateTemplate(ctx context.Context, request *UpdateTemplateBody, options ...RequestOption) (SubscriptionTemplateUpdateTemplateRes, error) {
 	return sc.client.SubscriptionTemplateUpdateTemplate(ctx, request, options...)
 }
 
@@ -1250,30 +1222,22 @@ func NewSubscriptionsClient(client *Client) *SubscriptionsClient {
 }
 
 // GetAllSubscriptions calls Subscriptions_getAllSubscriptions.
-func (sc *SubscriptionsClient) GetAllSubscriptions(ctx context.Context, size int, start int, options ...RequestOption) (SubscriptionsGetAllSubscriptionsRes, error) {
+func (sc *SubscriptionsClient) GetAllSubscriptions(ctx context.Context, start int, size int, options ...RequestOption) (SubscriptionsGetAllSubscriptionsRes, error) {
 	return sc.client.SubscriptionsGetAllSubscriptions(ctx, SubscriptionsGetAllSubscriptionsParams{
-		Size: NewOptInt(size),
 		Start: NewOptInt(start),
+		Size: NewOptInt(size),
 	}, options...)
 }
 
-// GetConnectionKeysByUuid calls Subscriptions_getConnectionKeysByUuid.
-func (sc *SubscriptionsClient) GetConnectionKeysByUuid(ctx context.Context, uuid string, options ...RequestOption) (SubscriptionsGetConnectionKeysByUuidRes, error) {
-	return sc.client.SubscriptionsGetConnectionKeysByUuid(ctx, SubscriptionsGetConnectionKeysByUuidParams{
-		UUID: uuid,
-	}, options...)
-}
-
-// GetRawSubscriptionByShortUuid calls Subscriptions_getRawSubscriptionByShortUuid.
-func (sc *SubscriptionsClient) GetRawSubscriptionByShortUuid(ctx context.Context, withdisabledhosts bool, shortuuid string, options ...RequestOption) (SubscriptionsGetRawSubscriptionByShortUuidRes, error) {
-	return sc.client.SubscriptionsGetRawSubscriptionByShortUuid(ctx, SubscriptionsGetRawSubscriptionByShortUuidParams{
-		WithDisabledHosts: NewOptBool(withdisabledhosts),
-		ShortUuid: shortuuid,
+// GetConnectionKeysByUserId calls Subscriptions_getConnectionKeysByUserId.
+func (sc *SubscriptionsClient) GetConnectionKeysByUserId(ctx context.Context, userid float64, options ...RequestOption) (SubscriptionsGetConnectionKeysByUserIdRes, error) {
+	return sc.client.SubscriptionsGetConnectionKeysByUserId(ctx, SubscriptionsGetConnectionKeysByUserIdParams{
+		UserId: userid,
 	}, options...)
 }
 
 // GetSubpageConfigByShortUuid calls Subscriptions_getSubpageConfigByShortUuid.
-func (sc *SubscriptionsClient) GetSubpageConfigByShortUuid(ctx context.Context, request *GetSubpageConfigByShortUuidRequestBody, shortuuid string, options ...RequestOption) (SubscriptionsGetSubpageConfigByShortUuidRes, error) {
+func (sc *SubscriptionsClient) GetSubpageConfigByShortUuid(ctx context.Context, request *GetSubpageConfigByShortUuidBody, shortuuid string, options ...RequestOption) (SubscriptionsGetSubpageConfigByShortUuidRes, error) {
 	return sc.client.SubscriptionsGetSubpageConfigByShortUuid(ctx, request, SubscriptionsGetSubpageConfigByShortUuidParams{
 		ShortUuid: shortuuid,
 	}, options...)
@@ -1294,9 +1258,9 @@ func (sc *SubscriptionsClient) GetSubscriptionByUsername(ctx context.Context, us
 }
 
 // GetSubscriptionByUuid calls Subscriptions_getSubscriptionByUuid.
-func (sc *SubscriptionsClient) GetSubscriptionByUuid(ctx context.Context, uuid string, options ...RequestOption) (SubscriptionsGetSubscriptionByUuidRes, error) {
+func (sc *SubscriptionsClient) GetSubscriptionByUuid(ctx context.Context, userid float64, options ...RequestOption) (SubscriptionsGetSubscriptionByUuidRes, error) {
 	return sc.client.SubscriptionsGetSubscriptionByUuid(ctx, SubscriptionsGetSubscriptionByUuidParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
@@ -1311,13 +1275,25 @@ func NewSystemClient(client *Client) *SystemClient {
 }
 
 // DebugSrrMatcher calls System_debugSrrMatcher.
-func (sc *SystemClient) DebugSrrMatcher(ctx context.Context, request *DebugSrrMatcherRequest, options ...RequestOption) (SystemDebugSrrMatcherRes, error) {
+func (sc *SystemClient) DebugSrrMatcher(ctx context.Context, request *DebugSrrMatcherBody, options ...RequestOption) (SystemDebugSrrMatcherRes, error) {
 	return sc.client.SystemDebugSrrMatcher(ctx, request, options...)
 }
 
 // GetBandwidthStats calls System_getBandwidthStats.
-func (sc *SystemClient) GetBandwidthStats(ctx context.Context, options ...RequestOption) (SystemGetBandwidthStatsRes, error) {
-	return sc.client.SystemGetBandwidthStats(ctx, options...)
+func (sc *SystemClient) GetBandwidthStats(ctx context.Context, tz string, options ...RequestOption) (SystemGetBandwidthStatsRes, error) {
+	return sc.client.SystemGetBandwidthStats(ctx, SystemGetBandwidthStatsParams{
+		Tz: NewOptString(tz),
+	}, options...)
+}
+
+// GetConfiguration calls System_getConfiguration.
+func (sc *SystemClient) GetConfiguration(ctx context.Context, options ...RequestOption) (SystemGetConfigurationRes, error) {
+	return sc.client.SystemGetConfiguration(ctx, options...)
+}
+
+// GetHttpStats calls System_getHttpStats.
+func (sc *SystemClient) GetHttpStats(ctx context.Context, options ...RequestOption) (SystemGetHttpStatsRes, error) {
+	return sc.client.SystemGetHttpStats(ctx, options...)
 }
 
 // GetMetadata calls System_getMetadata.
@@ -1350,6 +1326,11 @@ func (sc *SystemClient) GetStats(ctx context.Context, options ...RequestOption) 
 	return sc.client.SystemGetStats(ctx, options...)
 }
 
+// GetStatsDigest calls System_getStatsDigest.
+func (sc *SystemClient) GetStatsDigest(ctx context.Context, params SystemGetStatsDigestParams, options ...RequestOption) (SystemGetStatsDigestRes, error) {
+	return sc.client.SystemGetStatsDigest(ctx, params, options...)
+}
+
 // GetX25519Keypairs calls System_getX25519Keypairs.
 func (sc *SystemClient) GetX25519Keypairs(ctx context.Context, options ...RequestOption) (SystemGetX25519KeypairsRes, error) {
 	return sc.client.SystemGetX25519Keypairs(ctx, options...)
@@ -1366,11 +1347,8 @@ func NewTorrentBlockerReportsClient(client *Client) *TorrentBlockerReportsClient
 }
 
 // GetTorrentBlockerReports calls TorrentBlockerReports_getTorrentBlockerReports.
-func (sc *TorrentBlockerReportsClient) GetTorrentBlockerReports(ctx context.Context, size int, start int, options ...RequestOption) (TorrentBlockerReportsGetTorrentBlockerReportsRes, error) {
-	return sc.client.TorrentBlockerReportsGetTorrentBlockerReports(ctx, TorrentBlockerReportsGetTorrentBlockerReportsParams{
-		Size: NewOptInt(size),
-		Start: NewOptInt(start),
-	}, options...)
+func (sc *TorrentBlockerReportsClient) GetTorrentBlockerReports(ctx context.Context, params TorrentBlockerReportsGetTorrentBlockerReportsParams, options ...RequestOption) (TorrentBlockerReportsGetTorrentBlockerReportsRes, error) {
+	return sc.client.TorrentBlockerReportsGetTorrentBlockerReports(ctx, params, options...)
 }
 
 // GetTorrentBlockerReportsStats calls TorrentBlockerReports_getTorrentBlockerReportsStats.
@@ -1394,11 +1372,8 @@ func NewUserSubscriptionRequestHistoryClient(client *Client) *UserSubscriptionRe
 }
 
 // GetSubscriptionRequestHistory calls UserSubscriptionRequestHistory_getSubscriptionRequestHistory.
-func (sc *UserSubscriptionRequestHistoryClient) GetSubscriptionRequestHistory(ctx context.Context, size int, start int, options ...RequestOption) (UserSubscriptionRequestHistoryGetSubscriptionRequestHistoryRes, error) {
-	return sc.client.UserSubscriptionRequestHistoryGetSubscriptionRequestHistory(ctx, UserSubscriptionRequestHistoryGetSubscriptionRequestHistoryParams{
-		Size: NewOptInt(size),
-		Start: NewOptInt(start),
-	}, options...)
+func (sc *UserSubscriptionRequestHistoryClient) GetSubscriptionRequestHistory(ctx context.Context, params UserSubscriptionRequestHistoryGetSubscriptionRequestHistoryParams, options ...RequestOption) (UserSubscriptionRequestHistoryGetSubscriptionRequestHistoryRes, error) {
+	return sc.client.UserSubscriptionRequestHistoryGetSubscriptionRequestHistory(ctx, params, options...)
 }
 
 // GetSubscriptionRequestHistoryStats calls UserSubscriptionRequestHistory_getSubscriptionRequestHistoryStats.
@@ -1417,55 +1392,49 @@ func NewUsersClient(client *Client) *UsersClient {
 }
 
 // CreateUser calls Users_createUser.
-func (sc *UsersClient) CreateUser(ctx context.Context, request *CreateUserRequest, options ...RequestOption) (UsersCreateUserRes, error) {
+func (sc *UsersClient) CreateUser(ctx context.Context, request *CreateUserBody, options ...RequestOption) (UsersCreateUserRes, error) {
 	return sc.client.UsersCreateUser(ctx, request, options...)
 }
 
 // DeleteUser calls Users_deleteUser.
-func (sc *UsersClient) DeleteUser(ctx context.Context, uuid string, options ...RequestOption) (UsersDeleteUserRes, error) {
+func (sc *UsersClient) DeleteUser(ctx context.Context, userid float64, options ...RequestOption) (UsersDeleteUserRes, error) {
 	return sc.client.UsersDeleteUser(ctx, UsersDeleteUserParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
 // DisableUser calls Users_disableUser.
-func (sc *UsersClient) DisableUser(ctx context.Context, uuid string, options ...RequestOption) (UsersDisableUserRes, error) {
+func (sc *UsersClient) DisableUser(ctx context.Context, userid float64, options ...RequestOption) (UsersDisableUserRes, error) {
 	return sc.client.UsersDisableUser(ctx, UsersDisableUserParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
 // EnableUser calls Users_enableUser.
-func (sc *UsersClient) EnableUser(ctx context.Context, uuid string, options ...RequestOption) (UsersEnableUserRes, error) {
+func (sc *UsersClient) EnableUser(ctx context.Context, userid float64, options ...RequestOption) (UsersEnableUserRes, error) {
 	return sc.client.UsersEnableUser(ctx, UsersEnableUserParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
-// GetAllTags calls Users_getAllTags.
-func (sc *UsersClient) GetAllTags(ctx context.Context, options ...RequestOption) (UsersGetAllTagsRes, error) {
-	return sc.client.UsersGetAllTags(ctx, options...)
-}
-
-// GetAllUsers calls Users_getAllUsers.
-func (sc *UsersClient) GetAllUsers(ctx context.Context, size int, start int, options ...RequestOption) (UsersGetAllUsersRes, error) {
-	return sc.client.UsersGetAllUsers(ctx, UsersGetAllUsersParams{
-		Size: NewOptInt(size),
-		Start: NewOptInt(start),
+// ExtendUserExpirationDate calls Users_extendUserExpirationDate.
+func (sc *UsersClient) ExtendUserExpirationDate(ctx context.Context, request *ExtendUserBody, userid float64, options ...RequestOption) (UsersExtendUserExpirationDateRes, error) {
+	return sc.client.UsersExtendUserExpirationDate(ctx, request, UsersExtendUserExpirationDateParams{
+		UserId: userid,
 	}, options...)
 }
 
 // GetUserAccessibleNodes calls Users_getUserAccessibleNodes.
-func (sc *UsersClient) GetUserAccessibleNodes(ctx context.Context, uuid string, options ...RequestOption) (UsersGetUserAccessibleNodesRes, error) {
+func (sc *UsersClient) GetUserAccessibleNodes(ctx context.Context, userid float64, options ...RequestOption) (UsersGetUserAccessibleNodesRes, error) {
 	return sc.client.UsersGetUserAccessibleNodes(ctx, UsersGetUserAccessibleNodesParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
 // GetUserById calls Users_getUserById.
-func (sc *UsersClient) GetUserById(ctx context.Context, id string, options ...RequestOption) (UsersGetUserByIdRes, error) {
+func (sc *UsersClient) GetUserById(ctx context.Context, userid float64, options ...RequestOption) (UsersGetUserByIdRes, error) {
 	return sc.client.UsersGetUserById(ctx, UsersGetUserByIdParams{
-		ID: id,
+		UserId: userid,
 	}, options...)
 }
 
@@ -1476,13 +1445,6 @@ func (sc *UsersClient) GetUserByShortUuid(ctx context.Context, shortuuid string,
 	}, options...)
 }
 
-// GetUserByTelegramId calls Users_getUserByTelegramId.
-func (sc *UsersClient) GetUserByTelegramId(ctx context.Context, telegramid string, options ...RequestOption) (UsersGetUserByTelegramIdRes, error) {
-	return sc.client.UsersGetUserByTelegramId(ctx, UsersGetUserByTelegramIdParams{
-		TelegramId: telegramid,
-	}, options...)
-}
-
 // GetUserByUsername calls Users_getUserByUsername.
 func (sc *UsersClient) GetUserByUsername(ctx context.Context, username string, options ...RequestOption) (UsersGetUserByUsernameRes, error) {
 	return sc.client.UsersGetUserByUsername(ctx, UsersGetUserByUsernameParams{
@@ -1490,63 +1452,49 @@ func (sc *UsersClient) GetUserByUsername(ctx context.Context, username string, o
 	}, options...)
 }
 
-// GetUserByUuid calls Users_getUserByUuid.
-func (sc *UsersClient) GetUserByUuid(ctx context.Context, uuid string, options ...RequestOption) (UsersGetUserByUuidRes, error) {
-	return sc.client.UsersGetUserByUuid(ctx, UsersGetUserByUuidParams{
-		UUID: uuid,
-	}, options...)
-}
-
 // GetUserSubscriptionRequestHistory calls Users_getUserSubscriptionRequestHistory.
-func (sc *UsersClient) GetUserSubscriptionRequestHistory(ctx context.Context, uuid string, options ...RequestOption) (UsersGetUserSubscriptionRequestHistoryRes, error) {
+func (sc *UsersClient) GetUserSubscriptionRequestHistory(ctx context.Context, userid float64, options ...RequestOption) (UsersGetUserSubscriptionRequestHistoryRes, error) {
 	return sc.client.UsersGetUserSubscriptionRequestHistory(ctx, UsersGetUserSubscriptionRequestHistoryParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
-// GetUsersByEmail calls Users_getUsersByEmail.
-func (sc *UsersClient) GetUsersByEmail(ctx context.Context, email string, options ...RequestOption) (UsersGetUsersByEmailRes, error) {
-	return sc.client.UsersGetUsersByEmail(ctx, UsersGetUsersByEmailParams{
-		Email: email,
-	}, options...)
-}
-
-// GetUsersByTag calls Users_getUsersByTag.
-func (sc *UsersClient) GetUsersByTag(ctx context.Context, tag string, options ...RequestOption) (UsersGetUsersByTagRes, error) {
-	return sc.client.UsersGetUsersByTag(ctx, UsersGetUsersByTagParams{
-		Tag: tag,
-	}, options...)
+// GetUsers calls Users_getUsers.
+func (sc *UsersClient) GetUsers(ctx context.Context, params UsersGetUsersParams, options ...RequestOption) (UsersGetUsersRes, error) {
+	return sc.client.UsersGetUsers(ctx, params, options...)
 }
 
 // GetUsersStream calls Users_getUsersStream.
-func (sc *UsersClient) GetUsersStream(ctx context.Context, size int, cursor string, options ...RequestOption) (UsersGetUsersStreamRes, error) {
-	return sc.client.UsersGetUsersStream(ctx, UsersGetUsersStreamParams{
-		Size: NewOptInt(size),
-		Cursor: NewOptString(cursor),
-	}, options...)
+func (sc *UsersClient) GetUsersStream(ctx context.Context, params UsersGetUsersStreamParams, options ...RequestOption) (UsersGetUsersStreamRes, error) {
+	return sc.client.UsersGetUsersStream(ctx, params, options...)
+}
+
+// GetUsersTags calls Users_getUsersTags.
+func (sc *UsersClient) GetUsersTags(ctx context.Context, options ...RequestOption) (UsersGetUsersTagsRes, error) {
+	return sc.client.UsersGetUsersTags(ctx, options...)
 }
 
 // ResetUserTraffic calls Users_resetUserTraffic.
-func (sc *UsersClient) ResetUserTraffic(ctx context.Context, uuid string, options ...RequestOption) (UsersResetUserTrafficRes, error) {
+func (sc *UsersClient) ResetUserTraffic(ctx context.Context, userid float64, options ...RequestOption) (UsersResetUserTrafficRes, error) {
 	return sc.client.UsersResetUserTraffic(ctx, UsersResetUserTrafficParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
 // ResolveUser calls Users_resolveUser.
-func (sc *UsersClient) ResolveUser(ctx context.Context, request *ResolveUserRequestBody, options ...RequestOption) (UsersResolveUserRes, error) {
+func (sc *UsersClient) ResolveUser(ctx context.Context, request *ResolveUserBody, options ...RequestOption) (UsersResolveUserRes, error) {
 	return sc.client.UsersResolveUser(ctx, request, options...)
 }
 
 // RevokeUserSubscription calls Users_revokeUserSubscription.
-func (sc *UsersClient) RevokeUserSubscription(ctx context.Context, request *RevokeUserSubscriptionBody, uuid string, options ...RequestOption) (UsersRevokeUserSubscriptionRes, error) {
+func (sc *UsersClient) RevokeUserSubscription(ctx context.Context, request *RevokeUserSubscriptionBody, userid float64, options ...RequestOption) (UsersRevokeUserSubscriptionRes, error) {
 	return sc.client.UsersRevokeUserSubscription(ctx, request, UsersRevokeUserSubscriptionParams{
-		UUID: uuid,
+		UserId: userid,
 	}, options...)
 }
 
 // UpdateUser calls Users_updateUser.
-func (sc *UsersClient) UpdateUser(ctx context.Context, request *UpdateUserRequest, options ...RequestOption) (UsersUpdateUserRes, error) {
+func (sc *UsersClient) UpdateUser(ctx context.Context, request *UpdateUserBody, options ...RequestOption) (UsersUpdateUserRes, error) {
 	return sc.client.UsersUpdateUser(ctx, request, options...)
 }
 
@@ -1561,7 +1509,7 @@ func NewUsersBulkActionsClient(client *Client) *UsersBulkActionsClient {
 }
 
 // BulkAllExtendExpirationDate calls UsersBulkActions_bulkAllExtendExpirationDate.
-func (sc *UsersBulkActionsClient) BulkAllExtendExpirationDate(ctx context.Context, request *BulkAllExtendExpirationDateRequest, options ...RequestOption) (UsersBulkActionsBulkAllExtendExpirationDateRes, error) {
+func (sc *UsersBulkActionsClient) BulkAllExtendExpirationDate(ctx context.Context, request *BulkAllExtendExpirationDateBody, options ...RequestOption) (UsersBulkActionsBulkAllExtendExpirationDateRes, error) {
 	return sc.client.UsersBulkActionsBulkAllExtendExpirationDate(ctx, request, options...)
 }
 
@@ -1571,42 +1519,42 @@ func (sc *UsersBulkActionsClient) BulkAllResetUserTraffic(ctx context.Context, o
 }
 
 // BulkDeleteUsers calls UsersBulkActions_bulkDeleteUsers.
-func (sc *UsersBulkActionsClient) BulkDeleteUsers(ctx context.Context, request *BulkUuidsRequest, options ...RequestOption) (UsersBulkActionsBulkDeleteUsersRes, error) {
+func (sc *UsersBulkActionsClient) BulkDeleteUsers(ctx context.Context, request *UsersBodyBulkRequest, options ...RequestOption) (UsersBulkActionsBulkDeleteUsersRes, error) {
 	return sc.client.UsersBulkActionsBulkDeleteUsers(ctx, request, options...)
 }
 
 // BulkDeleteUsersByStatus calls UsersBulkActions_bulkDeleteUsersByStatus.
-func (sc *UsersBulkActionsClient) BulkDeleteUsersByStatus(ctx context.Context, request *BulkDeleteUsersByStatusRequest, options ...RequestOption) (UsersBulkActionsBulkDeleteUsersByStatusRes, error) {
+func (sc *UsersBulkActionsClient) BulkDeleteUsersByStatus(ctx context.Context, request *BulkDeleteUsersByStatusBody, options ...RequestOption) (UsersBulkActionsBulkDeleteUsersByStatusRes, error) {
 	return sc.client.UsersBulkActionsBulkDeleteUsersByStatus(ctx, request, options...)
 }
 
 // BulkExtendExpirationDate calls UsersBulkActions_bulkExtendExpirationDate.
-func (sc *UsersBulkActionsClient) BulkExtendExpirationDate(ctx context.Context, request *BulkExtendExpirationDateRequest, options ...RequestOption) (UsersBulkActionsBulkExtendExpirationDateRes, error) {
+func (sc *UsersBulkActionsClient) BulkExtendExpirationDate(ctx context.Context, request *BulkExtendExpirationDateBody, options ...RequestOption) (UsersBulkActionsBulkExtendExpirationDateRes, error) {
 	return sc.client.UsersBulkActionsBulkExtendExpirationDate(ctx, request, options...)
 }
 
 // BulkResetUserTraffic calls UsersBulkActions_bulkResetUserTraffic.
-func (sc *UsersBulkActionsClient) BulkResetUserTraffic(ctx context.Context, request *BulkUuidsRequest, options ...RequestOption) (UsersBulkActionsBulkResetUserTrafficRes, error) {
+func (sc *UsersBulkActionsClient) BulkResetUserTraffic(ctx context.Context, request *UsersBodyBulkRequest, options ...RequestOption) (UsersBulkActionsBulkResetUserTrafficRes, error) {
 	return sc.client.UsersBulkActionsBulkResetUserTraffic(ctx, request, options...)
 }
 
 // BulkRevokeUsersSubscription calls UsersBulkActions_bulkRevokeUsersSubscription.
-func (sc *UsersBulkActionsClient) BulkRevokeUsersSubscription(ctx context.Context, request *BulkUuidsRequest, options ...RequestOption) (UsersBulkActionsBulkRevokeUsersSubscriptionRes, error) {
+func (sc *UsersBulkActionsClient) BulkRevokeUsersSubscription(ctx context.Context, request *UsersBodyBulkRequest, options ...RequestOption) (UsersBulkActionsBulkRevokeUsersSubscriptionRes, error) {
 	return sc.client.UsersBulkActionsBulkRevokeUsersSubscription(ctx, request, options...)
 }
 
 // BulkUpdateAllUsers calls UsersBulkActions_bulkUpdateAllUsers.
-func (sc *UsersBulkActionsClient) BulkUpdateAllUsers(ctx context.Context, request *BulkAllUpdateUsersRequest, options ...RequestOption) (UsersBulkActionsBulkUpdateAllUsersRes, error) {
+func (sc *UsersBulkActionsClient) BulkUpdateAllUsers(ctx context.Context, request *BulkAllUpdateUsersBody, options ...RequestOption) (UsersBulkActionsBulkUpdateAllUsersRes, error) {
 	return sc.client.UsersBulkActionsBulkUpdateAllUsers(ctx, request, options...)
 }
 
 // BulkUpdateUsers calls UsersBulkActions_bulkUpdateUsers.
-func (sc *UsersBulkActionsClient) BulkUpdateUsers(ctx context.Context, request *BulkUpdateUsersRequest, options ...RequestOption) (UsersBulkActionsBulkUpdateUsersRes, error) {
+func (sc *UsersBulkActionsClient) BulkUpdateUsers(ctx context.Context, request *BulkUpdateUsersBody, options ...RequestOption) (UsersBulkActionsBulkUpdateUsersRes, error) {
 	return sc.client.UsersBulkActionsBulkUpdateUsers(ctx, request, options...)
 }
 
 // BulkUpdateUsersInternalSquads calls UsersBulkActions_bulkUpdateUsersInternalSquads.
-func (sc *UsersBulkActionsClient) BulkUpdateUsersInternalSquads(ctx context.Context, request *BulkUpdateUsersSquadsRequest, options ...RequestOption) (UsersBulkActionsBulkUpdateUsersInternalSquadsRes, error) {
+func (sc *UsersBulkActionsClient) BulkUpdateUsersInternalSquads(ctx context.Context, request *BulkUpdateUsersSquadsBody, options ...RequestOption) (UsersBulkActionsBulkUpdateUsersInternalSquadsRes, error) {
 	return sc.client.UsersBulkActionsBulkUpdateUsersInternalSquads(ctx, request, options...)
 }
 

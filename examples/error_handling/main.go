@@ -22,8 +22,8 @@ func main() {
 
 	// All API methods return a response interface that can be type-switched.
 	// Available error types depend on the endpoint — check the generated
-	// Res interface (e.g. UsersGetUserByUuidRes) for the full list.
-	resp, err := client.Users().GetUserByUuid(ctx, "invalid-uuid")
+	// Res interface (e.g. UsersGetUserByIdRes) for the full list.
+	resp, err := client.Users().GetUserById(ctx, -1)
 	if err != nil {
 		// Network or protocol error
 		log.Fatal(err)

@@ -10,6 +10,7 @@ A Go SDK client for interacting with the **[Remnawave API](https://remna.st)**.
 
 | API Version | SDK Version | Install |
 |-------------|-------------|---------|
+| 3.2.3 | v3.2.3 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3` |
 | 2.8.0 | v2.8.0 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.8.0` |
 | 2.6.1 | v2.6.1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.6.1` |
 | 2.5.3 | v2.5.3 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.5.3` |
@@ -29,7 +30,7 @@ Generated with [**ogen**](https://github.com/ogen-go/ogen) v1.19.0:
 ## Installation
 
 ```bash
-go get github.com/Jolymmiles/remnawave-api-go/v2@v2.8.0
+go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3
 ```
 
 ## Quick Start
@@ -55,16 +56,16 @@ func main() {
     // Wrap with organized sub-clients
     client := remapi.NewClientExt(baseClient)
 
-    // Get user by UUID - simple string argument
-    user, _ := client.Users().GetUserByUuid(ctx, "user-uuid-here")
+    // Get user by numeric ID
+    user, _ := client.Users().GetUserById(ctx, 1)
     fmt.Printf("User: %s\n", user.(*remapi.UserResponse).Response.Username)
 
-    // Get node by UUID
-    node, _ := client.Nodes().GetOneNode(ctx, "node-uuid-here")
-    fmt.Printf("Node: %s\n", node.(*remapi.NodeResponse).Response.Name)
+    // List nodes
+    nodes, _ := client.Nodes().GetNodes(ctx)
+    fmt.Printf("Nodes: %d\n", len(nodes.(*remapi.NodesResponseResponse).Response))
 
     // Create user
-    newUser, _ := client.Users().CreateUser(ctx, &remapi.CreateUserRequest{
+    newUser, _ := client.Users().CreateUser(ctx, &remapi.CreateUserBody{
         Username: "john_doe",
     })
     fmt.Printf("Created: %s\n", newUser.(*remapi.UserResponse).Response.Username)
@@ -107,7 +108,7 @@ func main() {
 Unified error types for consistent error handling:
 
 ```go
-resp, err := client.Users().GetUserByUuid(ctx, "invalid-uuid")
+resp, err := client.Users().GetUserById(ctx, -1)
 if err != nil {
     panic(err)
 }
@@ -151,9 +152,11 @@ type ValidationError struct {
 
 ### Users
 
+Users are identified by a numeric `ID` (see `UserItemInfo.ID`), plus lookup helpers by username/short UUID.
+
 ```go
-// Get by UUID (simplified - just pass the string)
-user, _ := client.Users().GetUserByUuid(ctx, "uuid-here")
+// Get by numeric ID
+user, _ := client.Users().GetUserById(ctx, 1)
 
 // Get by username
 user, _ := client.Users().GetUserByUsername(ctx, "john")
@@ -162,68 +165,72 @@ user, _ := client.Users().GetUserByUsername(ctx, "john")
 user, _ := client.Users().GetUserByShortUuid(ctx, "short-uuid")
 
 // Create
-user, _ := client.Users().CreateUser(ctx, &remapi.CreateUserRequest{
+user, _ := client.Users().CreateUser(ctx, &remapi.CreateUserBody{
     Username: "new_user",
 })
 
 // Update
-user, _ := client.Users().UpdateUser(ctx, &remapi.UpdateUserRequest{
-    Uuid: "uuid-here",
+user, _ := client.Users().UpdateUser(ctx, &remapi.UpdateUserBody{
+    ID: remapi.NewOptFloat64(1),
 })
 
 // Delete
-client.Users().DeleteUser(ctx, "uuid-here")
+client.Users().DeleteUser(ctx, 1)
 
 // Enable/Disable
-client.Users().EnableUser(ctx, "uuid-here")
-client.Users().DisableUser(ctx, "uuid-here")
+client.Users().EnableUser(ctx, 1)
+client.Users().DisableUser(ctx, 1)
 
 // Reset traffic
-client.Users().ResetUserTraffic(ctx, "uuid-here")
+client.Users().ResetUserTraffic(ctx, 1)
 ```
 
 ### Nodes
 
-```go
-// List all
-nodes, _ := client.Nodes().GetAllNodes(ctx)
+Nodes are identified by UUID via a `Params` struct (`uuid.UUID` isn't a simplifiable scalar).
 
-// Get one (simplified)
-node, _ := client.Nodes().GetOneNode(ctx, "uuid-here")
+```go
+import "github.com/google/uuid"
+
+// List all
+nodes, _ := client.Nodes().GetNodes(ctx)
+
+// Get one
+node, _ := client.Nodes().GetNode(ctx, remapi.NodesGetNodeParams{UUID: uuid.MustParse("uuid-here")})
 
 // Create
-node, _ := client.Nodes().CreateNode(ctx, &remapi.CreateNodeRequest{
+node, _ := client.Nodes().CreateNode(ctx, &remapi.CreateNodeBody{
     Name: "Node-1",
 })
 
 // Delete
-client.Nodes().DeleteNode(ctx, "uuid-here")
+client.Nodes().DeleteNode(ctx, remapi.NodesDeleteNodeParams{UUID: uuid.MustParse("uuid-here")})
 
 // Enable/Disable
-client.Nodes().EnableNode(ctx, "uuid-here")
-client.Nodes().DisableNode(ctx, "uuid-here")
+client.Nodes().EnableNode(ctx, remapi.NodesEnableNodeParams{UUID: uuid.MustParse("uuid-here")})
+client.Nodes().DisableNode(ctx, remapi.NodesDisableNodeParams{UUID: uuid.MustParse("uuid-here")})
 
 // Restart
-client.Nodes().RestartNode(ctx, "uuid-here")
+client.Nodes().RestartNode(ctx, &remapi.NodeBodyRequest{}, remapi.NodesRestartNodeParams{UUID: uuid.MustParse("uuid-here")})
 
 // Reset traffic
-client.Nodes().ResetNodeTraffic(ctx, "uuid-here")
+client.Nodes().ResetNodeTraffic(ctx, remapi.NodesResetNodeTrafficParams{UUID: uuid.MustParse("uuid-here")})
 ```
 
 ### Hosts
 
 ```go
 // List all
-hosts, _ := client.Hosts().GetAllHosts(ctx)
+hosts, _ := client.Hosts().GetHosts(ctx)
 
 // Get one
-host, _ := client.Hosts().GetOneHost(ctx, "uuid-here")
+host, _ := client.Hosts().GetOneHost(ctx, remapi.HostsGetOneHostParams{UUID: uuid.MustParse("uuid-here")})
 
 // Create
-host, _ := client.Hosts().CreateHost(ctx, &remapi.CreateHostRequest{...})
+host, _ := client.Hosts().CreateHost(ctx, &remapi.CreateHostBody{...})
 
 // Delete
-client.Hosts().DeleteHost(ctx, "uuid-here")
+client.Hosts().DeleteHost(ctx, remapi.HostsDeleteHostParams{UUID: uuid.MustParse("uuid-here")})
 ```
 
 ### Authentication
@@ -246,7 +253,7 @@ All methods support per-request `RequestOption` for customization:
 
 ```go
 // Pass options as the last variadic argument
-user, err := client.Users().GetUserByUuid(ctx, "uuid-here", opts...)
+user, err := client.Users().GetUserById(ctx, 1, opts...)
 ```
 
 ## Access to Base Client
@@ -269,7 +276,7 @@ See the [`examples/`](examples/) directory for complete working examples:
 | Requirement | Version |
 |-------------|---------|
 | Go | 1.21+ |
-| Remnawave API | 2.8.0+ |
+| Remnawave API | 3.2.3+ |
 
 ## License
 

@@ -24,21 +24,21 @@ func main() {
 	pager := remapi.NewPaginationHelper(50) // 50 items per page
 
 	for pager.HasMore {
-		resp, err := client.Users().GetAllUsers(ctx,
-			pager.Limit,  // size
-			pager.Offset, // start
-		)
+		resp, err := client.Users().GetUsers(ctx, remapi.UsersGetUsersParams{
+			Size:  remapi.NewOptInt(pager.Limit),
+			Start: remapi.NewOptInt(pager.Offset),
+		})
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		users, ok := resp.(*remapi.GetAllUsersResponse)
+		users, ok := resp.(*remapi.GetUsersResponse)
 		if !ok {
 			log.Fatal("unexpected response type")
 		}
 
 		for _, user := range users.Response.Users {
-			fmt.Printf("User: %s (UUID: %s)\n", user.Username, user.UUID)
+			fmt.Printf("User: %s (ID: %v, ShortUUID: %s)\n", user.Username, user.ID, user.ShortUuid)
 		}
 
 		// Advance to next page
