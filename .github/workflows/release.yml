@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    name: Verify tag builds & passes tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Test
+        run: go test ./... -race
+
+  release:
+    name: Publish GitHub Release
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          prev_tag="$(git tag --sort=-creatordate | grep -A1 "^${tag}$" | tail -n1)"
+          if [ "$prev_tag" = "$tag" ]; then
+            prev_tag=""
+          fi
+
+          notes_flag="--generate-notes"
+          if [ -n "$prev_tag" ]; then
+            notes_flag="--notes-start-tag $prev_tag --generate-notes"
+          fi
+
+          gh release create "$tag" \
+            --title "$tag" \
+            $notes_flag
