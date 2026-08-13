@@ -10,12 +10,14 @@ A Go SDK client for interacting with the **[Remnawave API](https://remna.st)**.
 
 | API Version | SDK Version | Install |
 |-------------|-------------|---------|
-| 3.2.3 | v3.2.3-1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3-1` |
+| 3.2.3 | v3.2.3-2 | `go get github.com/tesum/remnawave-api-go/v3@v3.2.3-2` |
 | 2.8.0 | v2.8.0 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.8.0` |
 | 2.6.1 | v2.6.1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.6.1` |
 | 2.5.3 | v2.5.3 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.5.3` |
 | 2.3.0 | v2.3.0-6 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.3.0-6` |
 | 2.2.6 | v2.2.6-1 | `go get github.com/Jolymmiles/remnawave-api-go/v2@v2.2.6-1` |
+
+> Starting at v3.2.3-2, this is a diverged fork published as `github.com/tesum/remnawave-api-go` — the module path was bumped to `/v3` to match Go's major-version-suffix rules (tags now track the panel's own major version). Older `v2.x` tags remain immutable and are only installable via the original `github.com/Jolymmiles/remnawave-api-go/v2` path baked into those specific tags.
 
 Generated with [**ogen**](https://github.com/ogen-go/ogen) v1.19.0:
 * Zero-reflection JSON decoder for high throughput
@@ -30,7 +32,7 @@ Generated with [**ogen**](https://github.com/ogen-go/ogen) v1.19.0:
 ## Installation
 
 ```bash
-go get github.com/Jolymmiles/remnawave-api-go/v2@v3.2.3-1
+go get github.com/tesum/remnawave-api-go/v3@v3.2.3-2
 ```
 
 ## Quick Start
@@ -41,7 +43,7 @@ package main
 import (
     "context"
     "fmt"
-    remapi "github.com/Jolymmiles/remnawave-api-go/v2/api"
+    remapi "github.com/tesum/remnawave-api-go/v3/api"
 )
 
 func main() {
